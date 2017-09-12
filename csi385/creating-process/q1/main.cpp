@@ -8,9 +8,7 @@ int main() {
 	system("mkdir something");
 	system("cd something");
 	system("kill 1057");
-
-	system("pause");
-
+	
 	return 0;
 
 }
