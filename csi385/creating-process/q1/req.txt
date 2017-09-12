@@ -1,0 +1,8 @@
+Using "system", write a program to perform the tasks of the previous assignment.
+--------------
+
+Open "Activity Monitor" and have a look at the various processes on your system
+Open the "terminal" and do the following:
+List all current processes
+Navigate to another directory
+Make a directory
