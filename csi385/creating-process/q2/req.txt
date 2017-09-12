@@ -1,0 +1,3 @@
+Using page 55 of your text-book as a starting point, write a program that launches a process.
+It should explicitly announce whether it is the parent process or the forked/child process
+It should be able to take in some arguments
