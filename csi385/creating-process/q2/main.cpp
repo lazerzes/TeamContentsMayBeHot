@@ -1,3 +1,24 @@
+/*       Authors: Rei Armenia, Matthew James Harrison
+ *         Class: CSI-385 Operating Systems Architecture
+ *    Assignment: Creating Processes
+ *      Due Date: September 12, 2017
+ *
+ * Description:
+ *   This C++ program demonstrates demonstrates fork and exec with arguments.
+ *
+ * Certication of Authenticity:
+ *   I certify that this is entirely my own work, except where I have given
+ *   fully-documented references to the work of others. I understand the
+ *   definition and consequences of plagiarism and acknowledge that the
+ *   assessor of this assignment may, for the purpose of assessing this
+ *   assignment:
+ *     -  Reproduce this assignment and provide a copy to another member of
+ *        academic staff; and/or
+ *     -  Communicate a copy of this assignment to a plagiarism checking service
+ *        (which may then retain a copy of this assignment on its database for
+ *        the purpose of future plagiarism checking)
+ ******************************************************************************/
+
 #include <iostream>
 #include <string>
 #include <unistd.h>
@@ -16,16 +37,18 @@ int main()
     char *program;
     char **arguments;
 
-    // Get the path of the program
+    // Get the program path via prompt
     cout << "What program would you like to run? ";
     cin >> data;
     data = BIN_PATH + data;
+
+    // Generate cstring in heap for program path
     length = data.length();
-    program = new char[length+1];
+    program = (char*)malloc(length+1);
     data.copy(program, length);
     program[length+1] = '\0';
 
-    // Get argc
+    // Get argument count via prompt
     cout << "How many arguments? ";
     cin >> data;
     for (size_t i = 0; i < data.length(); i++)
@@ -36,31 +59,59 @@ int main()
             exit(1);
         }
     }
-    argument_count = stoi(data);
-    arguments = new char*[argument_count+1];
 
-    // Get arguments
-    for (size_t i = 0; i < argument_count; i++)
+    // Allocate heap for arguments list
+    argument_count = stoi(data);
+    argument_count++; // need an extra argument for program path
+    arguments = (char**)malloc(sizeof(char*) * (argument_count+1));
+
+    // Get argument via prompt and allocate heap pointed from arguments list
+    arguments[0] = program; // first argument is program name
+    for (size_t i = 1; i < argument_count; i++)
     {
-        cout << "Please enter argument [" << i+1 << "]: ";
+        cout << "Please enter argument [" << i << "]: ";
         cin >> data;
         length = data.length();
-        arguments[i] = new char[length+1];
+        arguments[i] = (char*)malloc(length+1);
         data.copy(arguments[i], length);
         arguments[i][length+1] = '\0';
     }
-    arguments[argument_count] = NULL;
+    arguments[argument_count+1] = NULL; // null terminate arguments list
 
     pid = fork();
     if (pid > 0)
     {
         // Parent process
+        cout << "Parent: Waiting for child process to finish execution..."
+             << endl << endl;
         wait(NULL);
+        cout << endl << "Parent: Wait concluded. Terminating process." << endl;
     }
     else if (pid == 0)
     {
         // Child process
-        execv(program, arguments);
+        execv(arguments[0], arguments);
+
+        // The following code will only run if execv fails on child process
+        cout << "Child: Execution failed. Program not found." << endl;
+
+        // Free heap
+        for (size_t i = 0; i < argument_count; i++)
+        {
+            cout << "Freeing: " << arguments[i] << endl;
+            if (arguments[i] != NULL)
+            {
+                free(arguments[i]);
+                arguments[i] = NULL;
+            }
+        }
+        cout << "Freeing array." << endl;
+        if (arguments != NULL)
+        {
+            free(arguments);
+            arguments = NULL;
+        }
+        return 0;
         exit(1);
     }
     else
@@ -69,12 +120,5 @@ int main()
         perror("Fork failed with the following error");
         exit(1);
     }
-
-    for (size_t i = 0; i < argument_count; i++)
-    {
-        delete arguments[i];
-    }
-    delete [] arguments;
-
     return 0;
 }
