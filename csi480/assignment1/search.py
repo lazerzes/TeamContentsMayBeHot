@@ -136,7 +136,41 @@ def depth_first_search(problem):
 def breadth_first_search(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+    
+    visited = dict()
+    curr_state = problem.get_start_state();
+    frntr = util.Queue()
+    
+    record = {}
+    record["parent"] = None
+    record["act"] = None
+    record["state"] = curr_state
+    frntr.push(record)
+    
+    while not frntr.is_empty():
+        record = frntr.pop()
+        curr_state = record["state"]
+        if visited.has_key(hash(curr_state)):
+            continue
+        visited[hash(curr_state)] = True
+        
+        if problem.is_goal_state(curr_state) == True:
+            break
+        
+        for child in problem.get_successors(curr_state):
+            if not visited.has_key(hash(child[0])):
+                sub_node = {}
+                sub_node["parent"] = record
+                sub_node["act"] = child[1]
+                sub_node["state"] = child[0]
+                frntr.push(sub_node)
+
+    actions = []
+    while record["act"] != None:
+        actions.insert(0, record["act"])
+        record = record["parent"]
+    
+    return actions
 
 
 def uniform_cost_search(problem):
