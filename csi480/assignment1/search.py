@@ -176,7 +176,44 @@ def breadth_first_search(problem):
 def uniform_cost_search(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+    visited = dict()
+    curr_state = problem.get_start_state();
+    frntr = util.PriorityQueue()
+    
+    record = {}
+    record["parent"] = None
+    record["act"] = None
+    record["state"] = curr_state
+    record["cost"] = 0
+    frntr.push(record, record["cost"])
+    
+    while not frntr.is_empty():
+        record = frntr.pop()
+        curr_state = record["state"]
+        cost = record["cost"]
+        
+        if visited.has_key(hash(curr_state)):
+            continue
+        visited[hash(curr_state)] = True
+        
+        if problem.is_goal_state(curr_state) == True:
+            break
+        
+        for child in problem.get_successors(curr_state):
+            if not visited.has_key(hash(child[0])):
+                sub_node = {}
+                sub_node["parent"] = record
+                sub_node["act"] = child[1]
+                sub_node["state"] = child[0]
+                sub_node["cost"] = child[2] + cost
+                frntr.push(sub_node, sub_node["cost"])
+
+    actions = []
+    while record["act"] != None:
+        actions.insert(0, record["act"])
+        record = record["parent"]
+    
+    return actions
 
 
 def null_heuristic(state, problem=None):
@@ -190,7 +227,47 @@ def null_heuristic(state, problem=None):
 def a_star_search(problem, heuristic=null_heuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+    visited = dict()
+    curr_state = problem.get_start_state();
+    frntr = util.PriorityQueue()
+    
+    record = {}
+    record["parent"] = None
+    record["act"] = None
+    record["state"] = curr_state
+    record["cost"] = 0
+    record["heur"] = heuristic(curr_state, problem)
+    frntr.push(record, record["cost"] + record["heur"])
+    
+    while not frntr.is_empty():
+        record = frntr.pop()
+        curr_state = record["state"]
+        cost = record["cost"]
+        h = record["heur"]
+        
+        if visited.has_key(hash(curr_state)):
+            continue
+        visited[hash(curr_state)] = True
+        
+        if problem.is_goal_state(curr_state) == True:
+            break
+        
+        for child in problem.get_successors(curr_state):
+            if not visited.has_key(hash(child[0])):
+                sub_node = {}
+                sub_node["parent"] = record
+                sub_node["act"] = child[1]
+                sub_node["state"] = child[0]
+                sub_node["cost"] = child[2] + cost
+                sub_node["heur"] = heuristic(sub_node["state"], problem)
+                frntr.push(sub_node, sub_node["cost"] + sub_node["heur"])
+
+    actions = []
+    while record["act"] != None:
+        actions.insert(0, record["act"])
+        record = record["parent"]
+    
+    return actions
 
 # Abbreviations
 bfs = breadth_first_search
