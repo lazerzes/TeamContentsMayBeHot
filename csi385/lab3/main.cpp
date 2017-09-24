@@ -13,29 +13,41 @@
 
 using namespace std;
 
-int main() {
+int main()
+{
+    FILE *fpipe = NULL;
+    char *command = (char*)"ps -ax";
+    char *buf = NULL;
+    size_t rb = 0;
+    size_t pos = 0;
+    int i = 0;
+    string line = "";
     
-    FILE* fpipe;
-    char* command = (char*)"ps -ax";
-    char line[256];
-    string str;
-    
-    if(!(fpipe = (FILE*)popen(command, "r"))){
+    if (!(fpipe = (FILE*)popen(command, "r")))
+    {
         perror("Problems with pipe");
         exit(1);
     }
     
-    int t = 0;
-    
-    while( fgets(line, sizeof(line), fpipe)){
-        str = line;
-        if( t == 1){
-            str.replace(0, 7, "REDACTED");
+    while ( (rb = getline(&buf, &rb, fpipe)) != -1 )
+    {
+        line = buf;
+        
+        if (i == 0)
+        {
+            pos = line.find("COMMAND");
         }
-        cout << str;
-        t++;
+        else if (i == 1)
+        {
+            line.replace(pos, rb-1, "REDACTED\n");
+        }
+        
+        cout << line;
+
+        rb = 0;
+        free(buf);
+        buf = NULL;
+        i++;
     }
     pclose(fpipe);
-    
-    
 }
