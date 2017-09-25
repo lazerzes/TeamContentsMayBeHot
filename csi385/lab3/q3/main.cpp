@@ -21,56 +21,81 @@
 
 #include <iostream>
 #include <stdio.h>
+#include <sys/wait.h>
+#include <unistd.h>
 
 using namespace std;
 
-const string COMMANDS[4] = 
+void pipe_fork_exec(char *argv[])
 {
-    "ps aux",
-    "mkdir test",
-    "cd ..",
-    "kill 1057"
-};
+    char buf;
+    int pipefd[2];
+    pid_t pid;
+    int rb;
 
-int main() {
-
-    FILE *fpipe = NULL;
-    char *buf = NULL;
-    size_t rb = -1;
-    string line;
-
-	for (int i = 0; i < 3; i++)
-	{
-	    cout << COMMANDS[i] << endl;
-	
-	    fpipe = (FILE*)popen(COMMANDS[i].c_str(), "r");
-	    if (fpipe == NULL)
-	    {
-	        perror("Problems with pipe");
-	        exit(1);
-	    }
-	    
-	    while ( (rb = getline(&buf, &rb, fpipe)) != -1 )
+    pipe(pipefd);
+    pid = fork();
+    
+    if (pid == 0)
+    {
+        close(pipefd[0]);
+        dup2(pipefd[1], 1);
+        
+        execv(argv[0], argv);
+        
+        close(pipefd[1]);
+        perror("Failed to execute");
+    }
+    else if (pid > 0)
+    {
+        close(pipefd[1]);
+        
+        while (rb = read(pipefd[0], &buf, 1))
         {
-            if (buf == NULL)
-            {
-                perror("Failed to read line");
-                exit(1);
-            }
-            
-            line = buf;
-            cout << line;
-            
-            rb = -1;
-            free(buf);
-            buf = NULL;
+            cout << buf;
         }
         
-        pclose(fpipe);
-        
-        cout << endl;
+        close(pipefd[0]);
     }
+    else
+    {
+        perror("Failed to fork");
+        exit(1);
+    }
+}
 
+int main() 
+{
+    char *argv_ps[] = 
+    {
+        "/bin/ps",
+        "-aux",
+        NULL
+    };
+    char *argv_mkdir[] = 
+    {
+        "/bin/mkdir",
+        "test",
+        NULL
+    };
+    char *argv_cd[] = 
+    {
+        "/bin/cd",
+        "test",
+        NULL
+    };
+    char *argv_kill[] = 
+    {
+        "/bin/kill",
+        "1057",
+        NULL
+    };
+    
+    pipe_fork_exec(argv_ps);
+    pipe_fork_exec(argv_mkdir);
+    pipe_fork_exec(argv_cd);
+    pipe_fork_exec(argv_kill);
+    
 	return 0;
 
 }

@@ -62,7 +62,7 @@ int main()
         close(pipefd[0]); // Close STDIN
         dup2(pipefd[1], 1); // Redirect STDOUT to pipe output
         
-        execvp(argv_ps[0], argv_ps);
+        execv(argv_ps[0], argv_ps);
         
         perror("Failed to execute program");
         exit(1);
@@ -85,7 +85,12 @@ int main()
                 // Scan header
                 if (i == 0)
                 {
-                    pos = line.find("COMMAND");
+                    // Column we want is always aligned with the C in COMMAND
+                    if ((pos = line.find("COMMAND")) == -1)
+                    {
+                        perror("Unable to parse ps header");
+                        exit(1);
+                    }
                 }
                 // Redact first process name
                 else if (i == 1)
@@ -102,4 +107,5 @@ int main()
         }
         wait(NULL);
     }
+    return 0;
 }
