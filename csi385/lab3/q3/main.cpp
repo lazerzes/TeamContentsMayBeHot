@@ -6,6 +6,15 @@
  * Description:
  *   This C++ program demonstrates using pipes with fork and exec.
  *
+ * Research:
+ *   Creating pipes in C: http://tldp.org/LDP/lpg/node11.html
+ *   Using dup2 for Redirection and Pipes: http://www.cs.loyola.edu/~jglenn/702/
+ *     S2005/Examples/dup2.html
+ *   Example - exec and pipes: http://www.minek.com/files/unix_examples/execill.
+ *     html
+ *   Mapping UNIX pipe descriptors to stdin and stdout in C: http://www.unixwiz.
+ *     net/techtips/remap-pipe-fds.html
+ *
  * Certication of Authenticity:
  *   I certify that this is entirely my own work, except where I have given
  *   fully-documented references to the work of others. I understand the
