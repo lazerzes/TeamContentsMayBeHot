@@ -4,7 +4,7 @@
  *      Due Date: September 24, 2017
  *
  * Description:
- *   This C++ program...
+ *   This C++ program demonstrates using pipes with fork and exec.
  *
  * Certication of Authenticity:
  *   I certify that this is entirely my own work, except where I have given
