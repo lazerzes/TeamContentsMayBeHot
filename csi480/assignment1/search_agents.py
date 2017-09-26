@@ -416,11 +416,23 @@ def corners_heuristic(state, problem):
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    print "Walls:", walls
-    position = state[0]
-    heuristic = min([abs(position[0] - goal[0]) + abs(position[1] - goal[1]) for goal in corners])
-    print "Heuristic:", heuristic
-    return heuristic
+    # Create list of unvisited goals
+    unvisited_goals = map( lambda x:x[0], filter(lambda x:x[1] == 0, zip(corners, state[1])))
+
+    # If unvisited goals exist
+    if unvisited_goals:
+        # Build a dictionary mapping each goal to its Manhattan Distance from Pacman
+        x1,y1 = state[0]
+        distances = { abs(x1 - x2) + abs(y1 - y2): (x2,y2) for x2,y2 in unvisited_goals }
+
+        # Retrieve shortest distance and its corresponding corner coordinates
+        shortest_distance = min(distances.keys())
+        x2,y2 = distances[shortest_distance]
+
+        # Compute some operand based on walls between Pacman and the x2,y2
+    else:
+        shortest_distance = 0
+    return shortest_distance
 
 
 class AStarCornersAgent(SearchAgent):
