@@ -95,124 +95,124 @@ def depth_first_search(problem):
     """
     "*** YOUR CODE HERE ***"
     print problem
-    
-    visited = dict()
-    curr_state = problem.get_start_state();
-    frntr = util.Stack()
-    
+
+    visited = {}
+    current_state = problem.get_start_state();
+    frontier = util.Stack()
+
     record = {}
     record["parent"] = None
     record["act"] = None
-    record["state"] = curr_state
-    frntr.push(record)
-    
-    while not frntr.is_empty():
-        record = frntr.pop()
-        curr_state = record["state"]
-        if visited.has_key(hash(curr_state)):
+    record["state"] = current_state
+    frontier.push(record)
+
+    while not frontier.is_empty():
+        record = frontier.pop()
+        current_state = record["state"]
+        if visited.has_key(hash(current_state)):
             continue
-        visited[hash(curr_state)] = True
-        
-        if problem.is_goal_state(curr_state) == True:
+        visited[hash(current_state)] = True
+
+        if problem.is_goal_state(current_state) == True:
             break
-        
-        for child in problem.get_successors(curr_state):
+
+        for child in problem.get_successors(current_state):
             if not visited.has_key(hash(child[0])):
                 sub_node = {}
                 sub_node["parent"] = record
                 sub_node["act"] = child[1]
                 sub_node["state"] = child[0]
-                frntr.push(sub_node)
+                frontier.push(sub_node)
 
     actions = []
     while record["act"] != None:
         actions.insert(0, record["act"])
         record = record["parent"]
-    
+
     return actions
-    
+
 
 
 def breadth_first_search(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    
-    visited = dict()
-    curr_state = problem.get_start_state();
-    frntr = util.Queue()
-    
+
+    visited = {}
+    current_state = problem.get_start_state();
+    frontier = util.Queue()
+
     record = {}
     record["parent"] = None
     record["act"] = None
-    record["state"] = curr_state
-    frntr.push(record)
-    
-    while not frntr.is_empty():
-        record = frntr.pop()
-        curr_state = record["state"]
-        if visited.has_key(hash(curr_state)):
+    record["state"] = current_state
+    frontier.push(record)
+
+    while not frontier.is_empty():
+        record = frontier.pop()
+        current_state = record["state"]
+        if visited.has_key(hash(current_state)):
             continue
-        visited[hash(curr_state)] = True
-        
-        if problem.is_goal_state(curr_state) == True:
+        visited[hash(current_state)] = True
+
+        if problem.is_goal_state(current_state) == True:
             break
-        
-        for child in problem.get_successors(curr_state):
+
+        for child in problem.get_successors(current_state):
             if not visited.has_key(hash(child[0])):
                 sub_node = {}
                 sub_node["parent"] = record
                 sub_node["act"] = child[1]
                 sub_node["state"] = child[0]
-                frntr.push(sub_node)
+                frontier.push(sub_node)
 
     actions = []
     while record["act"] != None:
         actions.insert(0, record["act"])
         record = record["parent"]
-    
+
     return actions
 
 
 def uniform_cost_search(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    visited = dict()
-    curr_state = problem.get_start_state();
-    frntr = util.PriorityQueue()
-    
+    visited = {}
+    current_state = problem.get_start_state();
+    frontier = util.PriorityQueue()
+
     record = {}
     record["parent"] = None
     record["act"] = None
-    record["state"] = curr_state
+    record["state"] = current_state
     record["cost"] = 0
-    frntr.push(record, record["cost"])
-    
-    while not frntr.is_empty():
-        record = frntr.pop()
-        curr_state = record["state"]
+    frontier.push(record, record["cost"])
+
+    while not frontier.is_empty():
+        record = frontier.pop()
+        current_state = record["state"]
         cost = record["cost"]
-        
-        if visited.has_key(hash(curr_state)):
+
+        if visited.has_key(hash(current_state)):
             continue
-        visited[hash(curr_state)] = True
-        
-        if problem.is_goal_state(curr_state) == True:
+        visited[hash(current_state)] = True
+
+        if problem.is_goal_state(current_state) == True:
             break
-        
-        for child in problem.get_successors(curr_state):
+
+        for child in problem.get_successors(current_state):
             if not visited.has_key(hash(child[0])):
                 sub_node = {}
                 sub_node["parent"] = record
                 sub_node["act"] = child[1]
                 sub_node["state"] = child[0]
                 sub_node["cost"] = child[2] + cost
-                frntr.push(sub_node, sub_node["cost"])
+                frontier.push(sub_node, sub_node["cost"])
 
     actions = []
     while record["act"] != None:
         actions.insert(0, record["act"])
         record = record["parent"]
-    
+
     return actions
 
 
@@ -227,32 +227,32 @@ def null_heuristic(state, problem=None):
 def a_star_search(problem, heuristic=null_heuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    visited = dict()
-    curr_state = problem.get_start_state();
-    frntr = util.PriorityQueue()
-    
+    visited = {}
+    current_state = problem.get_start_state();
+    frontier = util.PriorityQueue()
+
     record = {}
     record["parent"] = None
     record["act"] = None
-    record["state"] = curr_state
+    record["state"] = current_state
     record["cost"] = 0
-    record["heur"] = heuristic(curr_state, problem)
-    frntr.push(record, record["cost"] + record["heur"])
-    
-    while not frntr.is_empty():
-        record = frntr.pop()
-        curr_state = record["state"]
+    record["heur"] = heuristic(current_state, problem)
+    frontier.push(record, record["cost"] + record["heur"])
+
+    while not frontier.is_empty():
+        record = frontier.pop()
+        current_state = record["state"]
         cost = record["cost"]
         h = record["heur"]
-        
-        if visited.has_key(hash(curr_state)):
+
+        if visited.has_key(hash(current_state)):
             continue
-        visited[hash(curr_state)] = True
-        
-        if problem.is_goal_state(curr_state) == True:
+        visited[hash(current_state)] = True
+
+        if problem.is_goal_state(current_state) == True:
             break
-        
-        for child in problem.get_successors(curr_state):
+
+        for child in problem.get_successors(current_state):
             if not visited.has_key(hash(child[0])):
                 sub_node = {}
                 sub_node["parent"] = record
@@ -260,13 +260,13 @@ def a_star_search(problem, heuristic=null_heuristic):
                 sub_node["state"] = child[0]
                 sub_node["cost"] = child[2] + cost
                 sub_node["heur"] = heuristic(sub_node["state"], problem)
-                frntr.push(sub_node, sub_node["cost"] + sub_node["heur"])
+                frontier.push(sub_node, sub_node["cost"] + sub_node["heur"])
 
     actions = []
     while record["act"] != None:
         actions.insert(0, record["act"])
         record = record["parent"]
-    
+
     return actions
 
 # Abbreviations

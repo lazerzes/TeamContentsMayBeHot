@@ -306,6 +306,9 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
+        self.corners_visited = [0, 0, 0, 0]
+        if self.starting_position in self.corners:
+            corner_list[self.corners.index(self.starting_position)] = 1
 
     def get_start_state(self):
         """
@@ -313,14 +316,14 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        return self.starting_position, corners_visited
 
     def is_goal_state(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        return not (0 in self.corners_visited)
 
     def get_successors(self, state):
         """
