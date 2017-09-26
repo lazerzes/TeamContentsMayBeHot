@@ -44,6 +44,7 @@ from game import Actions
 import util
 import time
 import search
+from copy import deepcopy
 
 
 class GoWestAgent(Agent):
@@ -306,9 +307,17 @@ class CornersProblem(search.SearchProblem):
         # Please add any code here which you would like to use
         # in initializing the problem
         "*** YOUR CODE HERE ***"
-        self.corners_visited = [0, 0, 0, 0]
+
+        # Create Goal Object to add to initial state
+        goal = [0,0,0,0]
+
+        # Check if Starting Position is a cornder
         if self.starting_position in self.corners:
-            corner_list[self.corners.index(self.starting_position)] = 1
+            goal[self.corners.index(self.starting_position)] = 1
+
+        # Encode Starting State (Position, Goal)
+        self.starting_state = (self.starting_position, tuple(goal))
+
 
     def get_start_state(self):
         """
@@ -316,14 +325,15 @@ class CornersProblem(search.SearchProblem):
         space)
         """
         "*** YOUR CODE HERE ***"
-        return self.starting_position, corners_visited
+        return self.starting_state
 
     def is_goal_state(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
         "*** YOUR CODE HERE ***"
-        return not (0 in self.corners_visited)
+        # If a 0 is in the goal, which has been encoded as the second value in the state
+        return not(0 in state[1])
 
     def get_successors(self, state):
         """
@@ -346,6 +356,29 @@ class CornersProblem(search.SearchProblem):
             #   hits_wall = self.walls[nextx][nexty]
 
             "*** YOUR CODE HERE ***"
+
+            # Get the current position, which is the first element of state
+            x, y = state[0]
+
+            # Get the position of the next possible state by getting enumeration of the movement
+            dx, dy = Actions.direction_to_vector(action)
+            next_x, next_y = int(x + dx), int(y + dy)
+
+            # Check if the next space hits a wall
+            hits_wall = self.walls[next_x][next_y]
+
+            # If it doesnt hit the wall encode the state
+            if not hits_wall:
+                next_position = (next_x, next_y)
+                cost = 1;
+
+                # Check if the next space is a goal state
+                # deepcopy imported from copy at top
+                goal = list(deepcopy(state[1]))
+                if next_position in self.corners:
+                    goal[self.corners.index(next_position)] = 1
+
+                successors.append(((next_position, tuple(goal)), action, cost))
 
         self._expanded += 1  # DO NOT CHANGE
         return successors
@@ -383,7 +416,11 @@ def corners_heuristic(state, problem):
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
-    return 0  # Default to trivial solution
+    print "Walls:", walls
+    position = state[0]
+    heuristic = min([abs(position[0] - goal[0]) + abs(position[1] - goal[1]) for goal in corners])
+    print "Heuristic:", heuristic
+    return heuristic
 
 
 class AStarCornersAgent(SearchAgent):
