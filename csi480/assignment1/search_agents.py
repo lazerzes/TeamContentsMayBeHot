@@ -417,6 +417,7 @@ def corners_heuristic(state, problem):
 
     "*** YOUR CODE HERE ***"
     # Create list of unvisited goals
+    heuristic = 0
     unvisited_goals = map( lambda x:x[0], filter(lambda x:x[1] == 0, zip(corners, state[1])))
 
     # If unvisited goals exist
@@ -429,10 +430,14 @@ def corners_heuristic(state, problem):
         shortest_distance = min(distances.keys())
         x2,y2 = distances[shortest_distance]
 
-        # Compute some operand based on walls between Pacman and the x2,y2
-    else:
-        shortest_distance = 0
-    return shortest_distance
+        # Compute some operand based on walls between Pacman and the closest corner
+        wall_density = 0
+        for column in walls[x1:x2]:
+            for cell in column[y1:y2]:
+                if cell == True:
+                    wall_density += 1
+        heuristic += (shortest_distance + wall_density)
+    return heuristic
 
 
 class AStarCornersAgent(SearchAgent):
