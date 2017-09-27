@@ -538,7 +538,14 @@ def food_heuristic(state, problem):
     """
     position, food_grid = state
     "*** YOUR CODE HERE ***"
-    return 0
+    heuristic = 0
+    food_list = food_grid.as_list()
+    # Simple MD solution, passes all tests except tricky
+    if food_list:
+        x1,y1 = state[0]
+        shortest_distance = min([ abs(x1 - x2) + abs(y1 - y2) for x2,y2 in food_list ])
+        heuristic += shortest_distance
+    return heuristic
 
 
 class ClosestDotSearchAgent(SearchAgent):
