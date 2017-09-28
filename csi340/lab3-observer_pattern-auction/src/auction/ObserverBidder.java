@@ -13,6 +13,9 @@ public class ObserverBidder implements IObserver {
         if(subject instanceof SubjectAuction){
             this.item = ((SubjectAuction) subject).item;
             this.largestBid = ((SubjectAuction) subject).bid;
+        }else{
+            System.out.println("ERROR: UNABLE TO UNPACK THE PASSED SUBJECT. QUITTING...");
+            System.exit(1);
         }
 
     }
@@ -25,7 +28,8 @@ public class ObserverBidder implements IObserver {
                 System.out.println(this + "could not bid, it is already the largest Bidder");
             }
         }else{
-            System.out.println("Passing Error");
+            System.out.println("ERROR: UNABLE TO UNPACK THE PASSED SUBJECT. QUITTING...");
+            System.exit(1);
         }
     }
 
