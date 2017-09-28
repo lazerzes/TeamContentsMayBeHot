@@ -46,7 +46,6 @@ import time
 import search
 from copy import deepcopy
 
-
 class GoWestAgent(Agent):
     "An agent that goes West until it can't."
 
@@ -398,7 +397,6 @@ class CornersProblem(search.SearchProblem):
                 return 999999
         return len(actions)
 
-
 def corners_heuristic(state, problem):
     """
     A heuristic for the CornersProblem that you defined.
@@ -416,27 +414,38 @@ def corners_heuristic(state, problem):
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
+    # This function finds the distance to the closest goal.
+    # Then it finds the distance from that goal to whichever goal is farthest from it.
+
     # Create list of unvisited goals
     heuristic = 0
-    unvisited_goals = map( lambda x:x[0], filter(lambda x:x[1] == 0, zip(corners, state[1])))
+    pos = state[0]
 
-    # If unvisited goals exist
+    # Remove visited goals from the list
+    unvisited_goals = filter(lambda g:g[1] == 0, zip(corners, state[1]))
+
+    # If any unvisited goals exist
     if unvisited_goals:
-        # Build a dictionary mapping each goal to its Manhattan Distance from Pacman
-        x1,y1 = state[0]
-        distances = { abs(x1 - x2) + abs(y1 - y2): (x2,y2) for x2,y2 in unvisited_goals }
+        # Strip each goal of its visited status
+        unvisited_goals = map(lambda g:g[0], unvisited_goals)
 
-        # Retrieve shortest distance and its corresponding corner coordinates
-        shortest_distance = min(distances.keys())
-        x2,y2 = distances[shortest_distance]
+        # Compute Manhattan Distance from Pacman to each goal
+        distances = map(lambda g:abs(pos[0] - g[0]) + abs(pos[1] - g[1]), unvisited_goals)
 
-        # Compute some operand based on walls between Pacman and the closest corner
-        wall_density = 0
-        for column in walls[x1:x2]:
-            for cell in column[y1:y2]:
-                if cell == True:
-                    wall_density += 1
-        heuristic += (shortest_distance + wall_density)
+        # Get distance to closest goal to Pacman
+        shortest_distance = reduce(lambda a,b: min([a,b]), distances)
+
+        # Get coordinates of closest goal to Pacman
+        dict = { a:b for a in distances for b in unvisited_goals }
+        closest_goal = dict[shortest_distance]
+
+        # Compute Manhattan Distance from closest goal to each goal
+        distances2 = map(lambda g:abs(closest_goal[0] - g[0]) + abs(closest_goal[1] - g[1]), unvisited_goals)
+
+        # Get distance of farthest goal
+        farthest_distance2 = reduce(lambda a,b: max([a,b]), distances2)
+
+        heuristic += shortest_distance + farthest_distance2
     return heuristic
 
 
@@ -539,12 +548,27 @@ def food_heuristic(state, problem):
     position, food_grid = state
     "*** YOUR CODE HERE ***"
     heuristic = 0
+    pos = state[0]
+
     food_list = food_grid.as_list()
-    # Simple MD solution, passes all tests except tricky
     if food_list:
-        x1,y1 = state[0]
-        shortest_distance = min([ abs(x1 - x2) + abs(y1 - y2) for x2,y2 in food_list ])
-        heuristic += shortest_distance
+        # Compute Manhattan Distance from Pacman to each food
+        distances = map(lambda f:abs(pos[0] - f[0]) + abs(pos[1] - f[1]), food_list)
+
+        # Get distance to closest food to Pacman
+        shortest_distance = reduce(lambda a,b: min([a,b]), distances)
+
+        # Get coordinates of closest food to Pacman
+        dict = { a:b for a in distances for b in food_list }
+        closest_food = dict[shortest_distance]
+
+        # Compute Manhattan Distance from closest food to each food
+        distances2 = map(lambda f:abs(closest_food[0] - f[0]) + abs(closest_food[1] - f[1]), food_list)
+
+        # Get distance of farthest food
+        farthest_distance2 = reduce(lambda a,b: max([a,b]), distances2)
+
+        heuristic += shortest_distance + farthest_distance2
     return heuristic
 
 
@@ -615,6 +639,7 @@ class AnyFoodSearchProblem(PositionSearchProblem):
         x, y = state
 
         "*** YOUR CODE HERE ***"
+        print state
         util.raise_not_defined()
 
 
