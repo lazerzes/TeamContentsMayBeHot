@@ -1,5 +1,26 @@
 """search_agents.py
+Author: Rei Armenia, Matthew James Harrison
+Class: CSI-480 AI
+Assignment: Search
+Due Date: September 28, 2017
 
+Description:
+All those colored walls,
+Mazes give Pacman the blues,
+So teach him to search.
+
+Certification of Authenticity:
+I certify that this is entirely my own work, except where I have given 
+fully-documented references to the work of others. I understand the definition 
+and consequences of plagiarism and acknowledge that the assessor of this
+assignment may, for the purpose of assessing this assignment:
+ - Reproduce this assignment and provide a copy to another member of academic
+   staff; and/or
+ - Communicate a copy of this assignment to a plagiarism checking service 
+   (which may then retain a copy of this assignment on its database for the 
+   purpose of future plagiarism checking)
+
+----------------------
 This file contains all of the agents that can be selected to control Pacman.  To
 select an agent, use the '-p' option when running pacman.py.  Arguments can be
 passed to your agent using '-a'.  For example, to load a SearchAgent that uses
