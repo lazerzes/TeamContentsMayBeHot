@@ -29,7 +29,7 @@ int main()
     {
         close(pipefd[1]);
 		dup2(pipefd[0], 0);
-        std::getline(std::cin, buffer);
+		std::cin >> buffer;
 		std::cout << buffer;
         close(pipefd[0]);
     }
