@@ -1,12 +1,13 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <iostream>
+#include <string>
 
 int main()
 {
     pid_t pid;
     int pipefd[2];
-    char buf[256];
+	string buffer;
 	char *args[] =
 	{
 		"/bin/ls",
@@ -28,8 +29,8 @@ int main()
     {
         close(pipefd[1]);
 		dup2(pipefd[0], 0);
-        read(pipefd[0], &buf, 256);
-        std::cout << buf;
+        std::getline(std::cin, buffer);
+		std::cout << buffer;
         close(pipefd[0]);
     }
     return 0;
