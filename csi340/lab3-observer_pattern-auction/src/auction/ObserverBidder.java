@@ -1,13 +1,20 @@
 package auction;
 
+import auction.stratergy.IBidStratergy;
 import observer.IObserver;
 import subject.ISubject;
 
 public class ObserverBidder implements IObserver {
 
-    Bid largestBid;
-    Item item;
+    public Bid largestBid;
+    public Item item;
+    public IBidStratergy bidStratergy;
 
+    public ObserverBidder(IBidStratergy bidStratergy){
+        this.bidStratergy = bidStratergy;
+    }
+
+    @Override
     public void update(ISubject subject){
 
         if(subject instanceof SubjectAuction){
@@ -23,7 +30,10 @@ public class ObserverBidder implements IObserver {
     public void makeBid(ISubject subject){
         if(subject instanceof SubjectAuction){
             if(!largestBid.bidder.equals(this)){
-
+                if(bidStratergy.shouldBid()){
+                    Bid bid = new Bid(this, this.bidStratergy.getBid(largestBid.ammount));
+                    ((SubjectAuction) subject).revieveBid(bid);
+                }
             }else{
                 System.out.println(this + "could not bid, it is already the largest Bidder");
             }
