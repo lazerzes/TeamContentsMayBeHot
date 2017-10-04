@@ -8,10 +8,10 @@ public class ObserverBidder implements IObserver {
 
     public Bid largestBid;
     public Item item;
-    public IBidStratergy bidStratergy;
+    public IBidStratergy bidStrategy;
 
     public ObserverBidder(IBidStratergy bidStratergy){
-        this.bidStratergy = bidStratergy;
+        this.bidStrategy = bidStratergy;
     }
 
     @Override
@@ -30,8 +30,8 @@ public class ObserverBidder implements IObserver {
     public void makeBid(ISubject subject){
         if(subject instanceof SubjectAuction){
             if(!largestBid.bidder.equals(this)){
-                if(bidStratergy.shouldBid()){
-                    Bid bid = new Bid(this, this.bidStratergy.getBid(largestBid.ammount));
+                if(bidStrategy.shouldBid()){
+                    Bid bid = new Bid(this, this.bidStrategy.getBid(largestBid.ammount));
                     ((SubjectAuction) subject).revieveBid(bid);
                 }
             }else{
