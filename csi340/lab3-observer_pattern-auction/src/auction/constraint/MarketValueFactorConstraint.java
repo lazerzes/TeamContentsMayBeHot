@@ -3,19 +3,20 @@ package auction.constraint;
 import auction.Bid;
 import auction.Item;
 
-public class MinBidCountConstraint implements IBidConstraint {
+public class MarketValueFactorConstraint implements IBidConstraint {
 
-	int min;
+	double factor;
 	
-	public MinBidCountConstraint(int min) {
-		this.min = min;
+	public MarketValueFactorConstraint(double factor) {
+		this.factor = factor;
 	}
 	
 	@Override
 	public boolean getResult(Bid largestBid, Bid myBid, Item item) {
 		boolean result = true;
 		
-		if (largestBid.getCount() < min) {
+		if (myBid.amount > (item.marketValue * factor))
+		{
 			result = false;
 		}
 		
