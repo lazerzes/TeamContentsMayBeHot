@@ -10,6 +10,4 @@ public abstract class Decoration extends Tree
 	{
 		this.tree = tree;
 	}
-	
-	public abstract double getCost();
 }

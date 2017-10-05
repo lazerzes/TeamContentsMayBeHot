@@ -9,5 +9,7 @@ public class HolidayTreeMain {
 		myTree = new Ruffles(myTree);
 		myTree = new Star(myTree);
 		myTree = new Ruffles(myTree);
+		myTree.print();
+		System.out.println("Total: $" + myTree.getCost());
 	}
 }
