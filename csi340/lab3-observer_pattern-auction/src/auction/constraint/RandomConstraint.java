@@ -9,8 +9,9 @@ public class RandomConstraint implements IBidConstraint {
 	public boolean getResult(Bid largestBid, Bid myBid, Item item) {
 		boolean result = true;
 		
-		if (Math.random() >= 0.5):
+		if (Math.random() >= 0.5) {
 			result = false;
+		}
 		
 		return result;
 	}
