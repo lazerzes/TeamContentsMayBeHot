@@ -1,8 +1,10 @@
 package auction.strategy;
 
+import auction.Bid;
+import auction.Item;
+
 public interface IBidStrategy {
 
-    double getBid(double current);
-    boolean shouldBid();
+    double getBid(Bid largestBid, Item item);
 
 }

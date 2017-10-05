@@ -1,6 +1,9 @@
 package auction;
 
+import java.util.ArrayList;
+
 import auction.strategy.IBidStrategy;
+import auction.constraint.IBidConstraint;
 import observer.IObserver;
 import subject.ISubject;
 
@@ -9,9 +12,10 @@ public class ObserverBidder implements IObserver {
     public Bid largestBid;
     public Item item;
     public IBidStrategy bidStrategy;
+    public ArrayList<IBidConstraint> bidConstraints;
 
     public ObserverBidder(IBidStrategy bidStrategy) {
-        this.bidStrategy = bidStrategy;
+        this.bidStrategy = (bidStrategy);
     }
 
     @Override
@@ -30,10 +34,26 @@ public class ObserverBidder implements IObserver {
     public void makeBid(ISubject subject){
         if(subject instanceof SubjectAuction) {
         	// If I am NOT the largest bidder
-            if(!largestBid.bidder.equals(this) ){
-                if(bidStrategy.shouldBid()){
-                    Bid bid = new Bid(this, this.bidStrategy.getBid(largestBid.ammount));
-                    ((SubjectAuction) subject).revieveBid(bid);
+            if(!largestBid.bidder.equals(this) ) {
+            	// Compute my bid amount
+            	Bid myBid = new Bid(this, this.bidStrategy.getBid(largestBid, item));
+            	
+            	// Check if my bid is sufficient
+            	if (myBid.amount <= largestBid.amount) {
+            		myBid.amount = 0;
+            	}
+            	
+            	// Check if my bid violates any of my constraints
+            	for (IBidConstraint constraint : this.bidConstraints) {
+            		if (!constraint.getResult(largestBid, myBid, item)) {
+            			myBid.amount = 0;
+            		}
+            	}
+            	
+            	// Finalize my bid if it passes constraints
+                if(myBid.amount > 0) {
+                	System.out.println(this + "is bidding" + myBid.amount);
+                    ((SubjectAuction) subject).revieveBid(myBid);
                 }
             }
             // If I AM the largest bidder

@@ -50,7 +50,7 @@ public class SubjectAuction implements ISubject {
 
     public void revieveBid(Bid bid) {
 
-        if(bid.ammount < this.bid.ammount || this.bid.equals(null)) {
+        if(bid.amount < this.bid.amount || this.bid.equals(null)) {
             this.bid = bid;
         }
 
