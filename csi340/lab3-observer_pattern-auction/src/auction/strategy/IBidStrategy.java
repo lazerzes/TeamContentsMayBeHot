@@ -1,4 +1,4 @@
-package auction.stratergy;
+package auction.strategy;
 
 public interface IBidStrategy {
 

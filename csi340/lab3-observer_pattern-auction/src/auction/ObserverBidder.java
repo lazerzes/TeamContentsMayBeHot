@@ -1,6 +1,6 @@
 package auction;
 
-import auction.stratergy.IBidStrategy;
+import auction.strategy.IBidStrategy;
 import observer.IObserver;
 import subject.ISubject;
 
