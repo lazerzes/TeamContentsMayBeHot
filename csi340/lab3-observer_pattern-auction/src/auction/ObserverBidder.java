@@ -30,6 +30,10 @@ public class ObserverBidder implements IObserver {
         }
 
     }
+    
+    public void addConstraint(IBidConstraint constraint) {
+    	this.bidConstraints.add(constraint);
+    }
 
     public void makeBid(ISubject subject){
         if(subject instanceof SubjectAuction) {
