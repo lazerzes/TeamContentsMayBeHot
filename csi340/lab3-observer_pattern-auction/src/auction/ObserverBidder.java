@@ -1,6 +1,6 @@
 package auction;
 
-import auction.stratergy.IBidStratergy;
+import auction.stratergy.IBidStrategy;
 import observer.IObserver;
 import subject.ISubject;
 
@@ -8,10 +8,10 @@ public class ObserverBidder implements IObserver {
 
     public Bid largestBid;
     public Item item;
-    public IBidStratergy bidStrategy;
+    public IBidStrategy bidStrategy;
 
-    public ObserverBidder(IBidStratergy bidStratergy){
-        this.bidStrategy = bidStratergy;
+    public ObserverBidder(IBidStrategy bidStrategy){
+        this.bidStrategy = bidStrategy;
     }
 
     @Override
