@@ -84,7 +84,7 @@ public class SubjectAuction implements ISubject {
         }
     }
 
-    public void recieveBid(Bid bid) {
+    public void receiveBid(Bid bid) {
 
         if(bid.amount < this.bid.amount || this.bid.equals(null)) {
             return;

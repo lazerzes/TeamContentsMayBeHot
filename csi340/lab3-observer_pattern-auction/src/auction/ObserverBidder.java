@@ -88,7 +88,7 @@ public class ObserverBidder implements IObserver {
     	// Finalize my bid if it passes constraints
         if(myBid.amount > 0) {
         	System.out.println(this + " is bidding " + myBid.amount);
-            ((SubjectAuction) subject).recieveBid(myBid);
+            ((SubjectAuction) subject).receiveBid(myBid);
         }
     }
 }

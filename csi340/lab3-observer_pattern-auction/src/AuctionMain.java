@@ -57,6 +57,6 @@ public class AuctionMain {
     	auction.registerObserver(bidder2);
     	auction.registerObserver(bidder3);
     	auction.registerObserver(bidder4);
-    	auction.recieveBid(new Bid(null, auction.item.basePrice));
+    	auction.receiveBid(new Bid(null, auction.item.basePrice));
     }
 }
