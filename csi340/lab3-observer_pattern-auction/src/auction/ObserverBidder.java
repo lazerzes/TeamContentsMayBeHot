@@ -12,9 +12,10 @@ public class ObserverBidder implements IObserver {
     public Bid largestBid;
     public Item item;
     public IBidStrategy bidStrategy;
-    public ArrayList<IBidConstraint> bidConstraints = new ArrayList<IBidConstraint>();
+    public ArrayList<IBidConstraint> bidConstraints;
 
     public ObserverBidder(IBidStrategy bidStrategy) {
+    	this.bidConstraints = new ArrayList<IBidConstraint>();
         this.bidStrategy = (bidStrategy);
     }
 
