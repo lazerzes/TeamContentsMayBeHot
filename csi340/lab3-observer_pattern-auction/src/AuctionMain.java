@@ -52,7 +52,11 @@ public class AuctionMain {
     	bidder4.addConstraint(new MaxBidCountConstraint(21));
     	bidder4.addConstraint(new RandomConstraint());
 
-    	SubjectAuction auction = new SubjectAuction(item1);
+    	SubjectAuction auction = new SubjectAuction(item1, 20);
+    	auction.registerObserver(bidder1);
+    	auction.registerObserver(bidder2);
+    	auction.registerObserver(bidder3);
+    	auction.registerObserver(bidder4);
+    	auction.revieveBid(new Bid(null, auction.item.basePrice));
     }
-
 }

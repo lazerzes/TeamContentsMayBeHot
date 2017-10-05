@@ -27,19 +27,25 @@ import subject.ISubject;
 
 import java.util.ArrayList;
 
+import auction.constraint.IBidConstraint;
+
 public class SubjectAuction implements ISubject {
 
     public Bid bid;
     public Item item;
+    public int timer;
 
     ArrayList<ObserverBidder> observers;
 
-    public SubjectAuction(Item item ){
+    public SubjectAuction(Item item, int timer){
         this.item = item;
-        this.bid = null;
+        this.bid = new Bid(null, item.basePrice);
         this.observers = new ArrayList<ObserverBidder>();
+        this.timer = timer;
+        
+    	System.out.println("Starting auction for: " + this.item + ". Base price: " + this.bid.amount);
     }
-
+    
     @Override
     public void registerObserver(IObserver observer) {
         if(observer instanceof ObserverBidder){
@@ -64,19 +70,28 @@ public class SubjectAuction implements ISubject {
     @Override
     public void notifyObservers() {
 
-        for (ObserverBidder bidder : this.observers) {
-            bidder.update(this);
+        this.timer -= 1;
+    	System.out.println("Timer:" + this.timer);
+        if (this.timer == 0 && !this.observers.isEmpty()) {
+        	System.out.println("Winner: " + this.bid.bidder + ". Final bid: " + this.bid.amount);
         }
-
+        else {
+            for (ObserverBidder bidder : this.observers) {
+        		if (this.bid.bidder != bidder && this.timer > 0) {
+                    bidder.update(this);
+        		}
+            }
+        }
     }
 
     public void revieveBid(Bid bid) {
 
         if(bid.amount < this.bid.amount || this.bid.equals(null)) {
-            this.bid = bid;
+            return;
         }
 
-        notifyObservers();
+        this.bid = bid;
+        this.notifyObservers();
 
     }
 

@@ -47,7 +47,9 @@ public class ObserverBidder implements IObserver {
         if(subject instanceof SubjectAuction) {
             this.item = ((SubjectAuction) subject).item;
             this.largestBid = ((SubjectAuction) subject).bid;
-        }else {
+            this.makeBid(subject);
+        }
+        else {
             System.out.println("ERROR: UNABLE TO UNPACK THE PASSED SUBJECT. QUITTING...");
             System.exit(1);
         }
@@ -59,39 +61,34 @@ public class ObserverBidder implements IObserver {
     }
 
     public void makeBid(ISubject subject){
-        if(subject instanceof SubjectAuction) {
-        	// If I am NOT the largest bidder
-            if(!largestBid.bidder.equals(this) ) {
-            	// Compute my bid amount
-            	Bid myBid = new Bid(this, this.bidStrategy.getBid(largestBid, item));
-            	
-            	// Check if my bid is sufficient
-            	if (myBid.amount <= largestBid.amount) {
-            		myBid.amount = 0;
-            	}
-            	
-            	// Check if my bid violates any of my constraints
-            	for (IBidConstraint constraint : this.bidConstraints) {
-            		if (!constraint.getResult(largestBid, myBid, item)) {
-            			myBid.amount = 0;
-            		}
-            	}
-            	
-            	// Finalize my bid if it passes constraints
-                if(myBid.amount > 0) {
-                	System.out.println(this + "is bidding" + myBid.amount);
-                    ((SubjectAuction) subject).revieveBid(myBid);
-                }
-            }
-            // If I AM the largest bidder
-            else {
-                System.out.println(this + "could not bid, it is already the largest Bidder");
-            }
-        }
-        else {
+    	if (!(subject instanceof SubjectAuction)) {
             System.out.println("ERROR: UNABLE TO UNPACK THE PASSED SUBJECT. QUITTING...");
             System.exit(1);
         }
+    	
+    	if (this == largestBid.bidder) {
+    		return;
+    	}
+    	
+    	// Compute my bid amount
+    	Bid myBid = new Bid(this, this.bidStrategy.getBid(largestBid, item));
+    	
+    	// Check if my bid is sufficient
+    	if (myBid.amount <= largestBid.amount) {
+    		return;
+    	}
+    	
+    	// Check if my bid violates any of my constraints
+    	for (IBidConstraint constraint : this.bidConstraints) {
+    		if (!constraint.getResult(largestBid, myBid, item)) {
+    			return;
+    		}
+    	}
+    	
+    	// Finalize my bid if it passes constraints
+        if(myBid.amount > 0) {
+        	System.out.println(this + " is bidding " + myBid.amount);
+            ((SubjectAuction) subject).revieveBid(myBid);
+        }
     }
-
 }
