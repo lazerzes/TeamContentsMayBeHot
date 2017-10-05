@@ -1,6 +1,6 @@
 package auction.stratergy;
 
-public interface IBidStratergy {
+public interface IBidStrategy {
 
     double getBid(double current);
     boolean shouldBid();

@@ -12,7 +12,7 @@ public class SubjectAuction implements ISubject {
 
     ArrayList<ObserverBidder> observers;
 
-    public SubjectAuction(Item item){
+    public SubjectAuction(Item item ){
         this.item = item;
         this.bid = null;
         this.observers = new ArrayList<ObserverBidder>();
@@ -30,9 +30,10 @@ public class SubjectAuction implements ISubject {
 
     @Override
     public void removerObserver(IObserver observer) {
-        if(observer instanceof ObserverBidder){
+        if(observer instanceof ObserverBidder) {
             this.observers.remove(observer);
-        }else{
+        }
+        else {
             System.out.println("Unable to remove Observer(" + observer + "). Incorrect observer type. \n Exiting program...");
             System.exit(1);
         }
@@ -47,9 +48,9 @@ public class SubjectAuction implements ISubject {
 
     }
 
-    public void revieveBid(Bid bid){
+    public void revieveBid(Bid bid) {
 
-        if(bid.ammount < this.bid.ammount || this.bid.equals(null)){
+        if(bid.ammount < this.bid.ammount || this.bid.equals(null)) {
             this.bid = bid;
         }
 
