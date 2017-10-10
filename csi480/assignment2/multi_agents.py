@@ -85,13 +85,9 @@ class ReflexAgent(Agent):
         current_pos = current_game_state.get_pacman_position()
         score = successor_game_state.get_score()
 
-        current_ghost_positions = [ ghost.get_position() for ghost in current_ghost_states]
-        current_ghost_distances = [ manhattan_distance(ghost_pos, current_pos) for ghost_pos in current_ghost_positions ]
         new_ghost_positions = [ ghost.get_position() for ghost in new_ghost_states ]
         new_ghost_distances = [ manhattan_distance(ghost_pos, new_pos) for ghost_pos in new_ghost_positions ]
 
-        current_food_positions = current_game_state.get_food().as_list()
-        current_food_distances = [ manhattan_distance(food_pos, current_pos) for food_pos in current_food_positions ]
         new_food_positions = successor_game_state.get_food().as_list()
         new_food_distances = [ manhattan_distance(food_pos, new_pos) for food_pos in new_food_positions ]
 
@@ -99,9 +95,7 @@ class ReflexAgent(Agent):
         if new_food_distances:
             evaluation += 10/(min(new_food_distances)+1)
         if new_ghost_distances:
-            evaluation -= 10/(min(new_ghost_distances)+1)
-        print(evaluation, "\n")
-
+            evaluation -= 15/(min(new_ghost_distances)+1)
         return evaluation
 
 def score_evaluation_function(current_game_state):
