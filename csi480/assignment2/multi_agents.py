@@ -80,15 +80,17 @@ class ReflexAgent(Agent):
         new_scared_times = [ghost_state.scared_timer for ghost_state in new_ghost_states]
 
         "*** YOUR CODE HERE ***"
-        new_ghost_positions = [ ghost.get_position() for ghost in new_ghost_states ]
-        new_ghost_distances = [ manhattan_distance(ghost_pos, new_pos) for ghost_pos in new_ghost_positions ]
-        ghost_distances_sum = sum(gman)
-        ghost_distances_mean = total/len(gman)
-        ghost_distances_min = min(gman)
+        ghost_positions = [ ghost.get_position() for ghost in new_ghost_states ]
+        ghost_distances = [ manhattan_distance(ghost_pos, new_pos) for ghost_pos in new_ghost_positions ]
+        ghost_distances_sum = sum(ghost_distances)
+        ghost_distances_mean = ghost_distances_sum/len(ghost_distances)
+        ghost_distances_min = min(ghost_distances)
 
         food_positions = successor_game_state.get_food().as_list()
         food_distances = [ manhattan_distance(food_pos, new_pos) for food_pos in food_positions ]
-        print(food_list)
+        food_distances_sum = sum(food_distances)
+        food_distances_mean = food_distances_sum/len(food_distances)
+        food_distances_min = min(food_distances)
 
         return successor_game_state.get_score()
 
