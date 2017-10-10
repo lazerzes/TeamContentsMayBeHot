@@ -96,8 +96,10 @@ class ReflexAgent(Agent):
         new_food_distances = [ manhattan_distance(food_pos, new_pos) for food_pos in new_food_positions ]
 
         evaluation = score
-        if new_pos in new_ghost_positions:
-            evaluation -= 500
+        if new_food_distances:
+            evaluation += 100/(min(new_food_distances)+1)
+        evaluation -= 500/(min(new_ghost_distances)+1)
+        print(evaluation, "\n")
 
         return evaluation
 
