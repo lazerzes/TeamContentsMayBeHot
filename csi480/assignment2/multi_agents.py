@@ -80,26 +80,24 @@ class ReflexAgent(Agent):
         new_scared_times = [ghost_state.scared_timer for ghost_state in new_ghost_states]
 
         "*** YOUR CODE HERE ***"
+        # Retrieve additional useful information
+        current_ghost_states = current_game_state.get_ghost_states()
+        current_pos = current_game_state.get_pacman_position()
         score = successor_game_state.get_score()
 
-        ghost_positions = [ ghost.get_position() for ghost in new_ghost_states ]
+        current_ghost_positions = [ ghost.get_position() for ghost in current_ghost_states]
+        current_ghost_distances = [ manhattan_distance(ghost_pos, current_pos) for ghost_pos in current_ghost_positions ]
+        new_ghost_positions = [ ghost.get_position() for ghost in new_ghost_states ]
+        new_ghost_distances = [ manhattan_distance(ghost_pos, new_pos) for ghost_pos in new_ghost_positions ]
 
-        if new_pos in ghost_positions:
-            return -100
+        current_food_positions = current_game_state.get_food().as_list()
+        current_food_distances = [ manhattan_distance(food_pos, current_pos) for food_pos in current_food_positions ]
+        new_food_positions = successor_game_state.get_food().as_list()
+        new_food_distances = [ manhattan_distance(food_pos, new_pos) for food_pos in new_food_positions ]
 
-        ghost_distances = [ manhattan_distance(ghost_pos, new_pos) for ghost_pos in ghost_positions ]
-        ghost_distances_sum = sum(ghost_distances)
-        ghost_distances_mean = ghost_distances_sum/len(ghost_distances)
-        ghost_distances_min = min(ghost_distances)
-
-        food_positions = successor_game_state.get_food().as_list()
-        food_distances = [ manhattan_distance(food_pos, new_pos) for food_pos in food_positions ]
-        food_distances_sum = sum(food_distances)
-        food_distances_mean = food_distances_sum/len(food_distances)
-        food_distances_min = min(food_distances)
-
-        evaluation = (10*food_distances_min) - (10/(ghost_distances_min+1))
-        print(evaluation)
+        evaluation = score
+        if new_pos in new_ghost_positions:
+            evaluation -= 500
 
         return evaluation
 
