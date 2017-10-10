@@ -80,21 +80,22 @@ class ReflexAgent(Agent):
         new_scared_times = [ghost_state.scared_timer for ghost_state in new_ghost_states]
 
         "*** YOUR CODE HERE ***"
-        # Retrieve additional useful information
-        current_ghost_states = current_game_state.get_ghost_states()
-        current_pos = current_game_state.get_pacman_position()
         score = successor_game_state.get_score()
 
+        # Computer Manhattan distances from Pacman to ghosts
         new_ghost_positions = [ ghost.get_position() for ghost in new_ghost_states ]
         new_ghost_distances = [ manhattan_distance(ghost_pos, new_pos) for ghost_pos in new_ghost_positions ]
 
+        # Compute Manhattan distances from Pacman to foods
         new_food_positions = successor_game_state.get_food().as_list()
         new_food_distances = [ manhattan_distance(food_pos, new_pos) for food_pos in new_food_positions ]
 
         evaluation = score
         if new_food_distances:
+            # Find closest food and compute bonus with inverse relation to distance
             evaluation += 10/(min(new_food_distances)+1)
         if new_ghost_distances:
+            # Find closest ghost and compute penalty with inverse relation to distance
             evaluation -= 15/(min(new_ghost_distances)+1)
         return evaluation
 
