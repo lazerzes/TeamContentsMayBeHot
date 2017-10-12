@@ -8,7 +8,7 @@ public class BallsBlue extends BaseDecoration{
     private static final String specialName = "Balls Blue";
     private static final double specialCost = 2.0D;
 
-    protected BallsBlue(BaseTree previousTree){
+    public BallsBlue(BaseTree previousTree){
 
         this.previousTree = previousTree;
 

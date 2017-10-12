@@ -58,4 +58,17 @@ public class TreeHelper {
         return false;
     }
 
+    public static BaseTree buildTree(BaseTree oldTree, BaseTree newTree){
+
+        if(newTree instanceof Star){
+            if(TreeHelper.hasStar(oldTree)){
+                System.out.println("Sorry! You can't add a star to a tree that already has a star!");
+                return oldTree;
+            }
+        }
+
+        return newTree;
+
+    }
+
 }
