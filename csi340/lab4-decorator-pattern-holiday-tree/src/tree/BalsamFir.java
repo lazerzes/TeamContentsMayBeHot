@@ -24,7 +24,7 @@ package tree;
 
 public class BalsamFir extends Tree
 {
-	private double cost = 20.0;
+	private double cost = 5.0;
 	private String name = "Balsam Fir";
 	
 	public double getCost()
