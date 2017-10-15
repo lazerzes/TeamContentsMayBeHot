@@ -134,6 +134,39 @@ class MinimaxAgent(MultiAgentSearchAgent):
       Your minimax agent (question 2)
     """
 
+    def minimax(self, game_state, current_depth, current_agent_index):
+        # Check if depth reached
+        if current_depth == self.depth:
+            print("Evaluating at depth:", current_depth, "/", self.depth)
+            return (None, self.evaluation_function(game_state))
+
+        # Agent index wrapping
+        if current_agent_index >= game_state.get_num_agents():
+            current_agent_index = 0
+
+        # Get all actions and their respective successors
+        legal_actions = game_state.get_legal_actions(current_agent_index)
+        all_successors = [ game_state.generate_successor(current_agent_index, action) for action in legal_actions ]
+
+        # Recurse for each successor to compute their values, incrementing agent index and depth
+        successor_values = [ self.minimax(successor, current_depth+1, current_agent_index+1)[1] for successor in all_successors]
+
+        print("Depth:", current_depth, "\nLegal actions:", legal_actions, "\nValues:", successor_values, "\n")
+
+        # Create tuples of related actions and values: (action, value)
+        successor_values = zip(legal_actions, successor_values)
+
+        if not legal_actions:
+            return (None, 0)
+
+        # Maximize if player or else minimize
+        if current_agent_index == 0:
+            result = max(successor_values, key=lambda x: x[1])
+        else:
+            result = min(successor_values, key=lambda x: x[1])
+        print(result)
+        return result
+
     def get_action(self, game_state):
         """
           Returns the minimax action from the current game_state using self.depth
@@ -152,6 +185,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
+        return self.minimax(game_state, 0, 0)[0]
+
         util.raise_not_defined()
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
