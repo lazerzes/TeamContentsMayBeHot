@@ -270,11 +270,9 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             if score > prev_score:
                 prefer_action = action
 
-<<<<<<< HEAD
+
         return prefer_action
-=======
-        util.raise_not_defined()
->>>>>>> 39803ca7a2f6edc7cee4361a1893e597faaacc92
+
 
 def better_evaluation_function(current_game_state):
     """
