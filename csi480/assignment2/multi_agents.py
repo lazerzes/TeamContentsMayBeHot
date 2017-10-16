@@ -145,10 +145,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         if depth == self.depth:
             return ('Stop', self.evaluation_function(state))
 
-        # Agent index wrapping
-        if agent >= state.get_num_agents():
-            agent = 0
-
         # Get all actions
         actions = state.get_legal_actions(agent)
         print(tab + 'Actions:', actions)
@@ -159,9 +155,16 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         # Get all successors
         successors = [ state.generate_successor(agent, action) for action in actions ]
-
+        
+        # Increment agent (with wrapping) and increment depth when all agents have acted
+        next_agent = agent+1
+        next_depth = depth
+        if next_agent >= state.get_num_agents():
+            next_agent = 0
+            next_depth += 1
+        
         # Recurse for each successor to compute their values, incrementing agent index and depth
-        values = [ self.minimax(successor, depth+1, agent+1)[1] for successor in successors ]
+        values = [ self.minimax(successor, next_depth, next_agent)[1] for successor in successors ]
         print(tab + 'Values:', values)
         print(tab)
 
