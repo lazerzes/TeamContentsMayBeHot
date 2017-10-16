@@ -215,13 +215,22 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         """
         "*** YOUR CODE HERE ***"
 
-        """
-            func_name: get_expected -- (en_US: Get Expected Value)
+        def get_max(game_state, depth):
+            if game_state.is_win() or game_state.is_lose() or depth is 0:
+                return self.evaluation_function(game_state)
 
-            desc:
-        """
+            legal_actions = game_state.get_legal_actions(0)
+            prefer_action = Directions.STOP
+            score = -(float("inf"))
+
+            for action in legal_actions:
+                prev_score = score
+                next_state = game_state.generate_successor(0, action)
+                score = max(score, get_expected(next_state, 1, depth))
+            return score
+
         def get_expected(game_state, index, depth):
-            if game_state.is_win() or game_state.is_lise() or depth is 0:
+            if game_state.is_win() or game_state.is_lose() or depth is 0:
                 return self.evaluation_function(game_state)
 
             number_ghosts = game_state.get_num_agents() - 1
@@ -232,31 +241,35 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             for action in legal_actions:
                 next_state = game_state.generate_successor(index, action)
                 if index is number_ghosts:
-                    total_val += get_max_value(next_state, depth - 1)
+                    total_val += get_max(next_state, depth - 1)
                 else:
-                    total_value += get_expected(next_state, index + 1, depth)
+                    total_val += get_expected(next_state, index + 1, depth)
 
-            return total_value / numbe_actions
+            return total_val / numbe_actions
 
+        " Main Function (kinda)"
         if(game_state.is_win() or game_state.is_lose()):
             return self.evaluation_function(game_state)
 
         legal_actions = game_state.get_legal_actions(0)
-        prefer_acrion = Directions.STOP
+        prefer_action = Directions.STOP
         score = -(float("inf"))
 
         for action in legal_actions:
             next_state = game_state.generate_successor(0, action)
             prev_score = score
+            score = max(score, get_expected(next_state, 1, self.depth))
+            if score > prev_score:
+                prefer_action = action
 
-    util.raise_not_defined()
+        return prefer_action
 
 def better_evaluation_function(current_game_state):
     """
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
       evaluation function (question 5).
 
-      DESCRIPTION: <write something here so we know what you did>
+      DESCRIPTION: <write something here so we know what you did>WW
     """
     "*** YOUR CODE HERE ***"
     util.raise_not_defined()
