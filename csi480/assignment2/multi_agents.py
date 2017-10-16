@@ -212,6 +212,9 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
           All ghosts should be modeled as choosing uniformly at random from their
           legal moves.
+
+          Description:
+            Implemented the Algorithm for expectimax
         """
         "*** YOUR CODE HERE ***"
 
@@ -269,9 +272,41 @@ def better_evaluation_function(current_game_state):
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
       evaluation function (question 5).
 
-      DESCRIPTION: <write something here so we know what you did>WW
+      DESCRIPTION: <write something here so we know what you did>
+
+      ~ Part I - Winning and Losing ~
+            Using some methods from  α-ß pruning:
+                game_state.is_win() → return +∞
+                game_state.is_lose() → return -∞
+
+            This should result in a greater weight put in towards winning.
+
+      ~ Part II - Eating Food ~
+            The shorter the game is, the less the chance for death,
+            so if you can eat you should.
+
+                first - find the closest food distance.
+                then factor into total evaluation
+
+
+      ~ Part III - Distance to Ghosts ~
+            Generally, it is better to just stay away from the
+            closest ghost
+            I.E. : Don't run into a ghost right next to you
+
+
     """
     "*** YOUR CODE HERE ***"
+
+    # Part I
+    if current_game_state.is_win():
+        return float("inf")
+
+    if current_game_state.is_lose():
+        return -(float("inf"))
+
+
+
     util.raise_not_defined()
 
 # Abbreviation
