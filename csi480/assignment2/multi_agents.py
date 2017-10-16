@@ -136,9 +136,14 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
 
     def minimax(self, state, depth, agent):
+        tab = ''
+        for i in range(0, depth):
+            tab += ' | '
+        print(tab + 'Depth:', depth, '/', self.depth)
+
         # Check if depth reached
         if depth == self.depth:
-            return (None, self.evaluation_function(state))
+            return ('Stop', self.evaluation_function(state))
 
         # Agent index wrapping
         if agent >= state.get_num_agents():
@@ -146,19 +151,22 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         # Get all actions
         actions = state.get_legal_actions(agent)
+        print(tab + 'Actions:', actions)
 
         # Check if terminal state
         if not actions:
-            return (None, self.evaluation_function(state))
+            return ('Stop', self.evaluation_function(state))
 
         # Get all successors
         successors = [ state.generate_successor(agent, action) for action in actions ]
 
         # Recurse for each successor to compute their values, incrementing agent index and depth
-        successors = [ self.minimax(successor, depth+1, agent+1)[1] for successor in successors ]
+        values = [ self.minimax(successor, depth+1, agent+1)[1] for successor in successors ]
+        print(tab + 'Values:', values)
+        print(tab)
 
         # Create tuples of related actions and values: (action, value)
-        successors = zip(actions, successors)
+        successors = zip(actions, values)
 
         # Maximize if player or else minimize
         if agent == 0:
