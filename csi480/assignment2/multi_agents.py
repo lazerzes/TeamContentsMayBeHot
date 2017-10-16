@@ -21,6 +21,7 @@ Pieter Abbeel (pabbeel@cs.berkeley.edu).
 from util import manhattan_distance
 from game import Directions
 import random, util
+import sys
 
 from game import Agent
 
@@ -134,38 +135,35 @@ class MinimaxAgent(MultiAgentSearchAgent):
       Your minimax agent (question 2)
     """
 
-    def minimax(self, game_state, current_depth, current_agent_index):
+    def minimax(self, state, depth, agent):
         # Check if depth reached
-        if current_depth == self.depth:
-            print("Evaluating at depth:", current_depth, "/", self.depth)
-            return (None, self.evaluation_function(game_state))
+        if depth == self.depth:
+            return (None, self.evaluation_function(state))
 
         # Agent index wrapping
-        if current_agent_index >= game_state.get_num_agents():
-            current_agent_index = 0
+        if agent >= state.get_num_agents():
+            agent = 0
 
-        # Get all actions and their respective successors
-        legal_actions = game_state.get_legal_actions(current_agent_index)
-        all_successors = [ game_state.generate_successor(current_agent_index, action) for action in legal_actions ]
+        # Get all actions
+        actions = state.get_legal_actions(agent)
+
+        # Check if terminal state
+        if not actions:
+            return (None, self.evaluation_function(state))
+
+        # Get all successors
+        successors = [ state.generate_successor(agent, action) for action in actions ]
 
         # Recurse for each successor to compute their values, incrementing agent index and depth
-        successor_values = [ self.minimax(successor, current_depth+1, current_agent_index+1)[1] for successor in all_successors]
-
-        print("Depth:", current_depth, "\nLegal actions:", legal_actions, "\nValues:", successor_values, "\n")
+        successors = [ self.minimax(successor, depth+1, agent+1)[1] for successor in successors ]
 
         # Create tuples of related actions and values: (action, value)
-        successor_values = zip(legal_actions, successor_values)
-
-        if not legal_actions:
-            return (None, 0)
+        successors = zip(actions, successors)
 
         # Maximize if player or else minimize
-        if current_agent_index == 0:
-            result = max(successor_values, key=lambda x: x[1])
-        else:
-            result = min(successor_values, key=lambda x: x[1])
-        print(result)
-        return result
+        if agent == 0:
+            return max(successors, key=lambda x: x[1])
+        return min(successors, key=lambda x: x[1])
 
     def get_action(self, game_state):
         """
@@ -185,9 +183,8 @@ class MinimaxAgent(MultiAgentSearchAgent):
             Returns the total number of agents in the game
         """
         "*** YOUR CODE HERE ***"
-        return self.minimax(game_state, 0, 0)[0]
 
-        util.raise_not_defined()
+        return self.minimax(game_state, 0, 0)[0]
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
