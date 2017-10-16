@@ -293,7 +293,6 @@ def better_evaluation_function(current_game_state):
             so if you can eat you should.
 
                 first - find the closest food distance.
-                then factor into total evaluation
 
 
       ~ Part III - Distance to Ghosts ~
@@ -301,9 +300,20 @@ def better_evaluation_function(current_game_state):
             closest ghost
             I.E. : Don't run into a ghost right next to you
 
+     ~ Part IV - Object Counts ~
+           The more options that we have left, the more we shoold change
+
+      ~ Part V - Combination ~
+            Add things together into one score.
+            Weight things in order to get better behavior
+
 
     """
     "*** YOUR CODE HERE ***"
+    evaluation = current_game_state.get_score()
+    new_ghost_states = current_game_state.get_ghost_states()
+    new_pos = current_game_state.get_pacman_position()
+    new_food = current_game_state.get_food()
 
     # Part I
     if current_game_state.is_win():
@@ -313,8 +323,28 @@ def better_evaluation_function(current_game_state):
         return -(float("inf"))
 
 
+    # Part II
+    new_food_positions = current_game_state.get_food().as_list()
+    new_food_distances = [ manhattan_distance(food_pos, new_pos) for food_pos in new_food_positions ]
 
-    util.raise_not_defined()
+
+
+    # Part III
+    new_ghost_positions = [ ghost.get_position() for ghost in new_ghost_states if ghost.scared_timer > 0 ]
+    new_ghost_distances = [ manhattan_distance(ghost_pos, new_pos) for ghost_pos in new_ghost_positions ]
+
+
+    # Part IV and Part V
+    if(new_food_distances):
+        evaluation -= (min(new_food_distances) * 1.5)
+        evaluation -= (len(new_food_distances) * 4)
+
+    evaluation += (3.5 * len(current_game_state.get_capsules()))
+
+    if(new_ghost_distances):
+        evaluation += (max((min(new_ghost_distances), 4) * 2 ))
+
+    return evaluation
 
 # Abbreviation
 better = better_evaluation_function
