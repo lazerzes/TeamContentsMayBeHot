@@ -246,7 +246,7 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             next_state = game_state.generate_successor(0, action)
             prev_score = score
 
-    util.raise_not_defined()
+        util.raise_not_defined()
 
 def better_evaluation_function(current_game_state):
     """
