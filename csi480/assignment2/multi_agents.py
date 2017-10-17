@@ -276,9 +276,6 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
           All ghosts should be modeled as choosing uniformly at random from their
           legal moves.
-
-          Description:
-            Implemented the Algorithm for expectimax
         """
         "*** YOUR CODE HERE ***"
 
@@ -338,34 +335,8 @@ def better_evaluation_function(current_game_state):
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
       evaluation function (question 5).
 
-      DESCRIPTION: <write something here so we know what you did>
-
-      ~ Part I - Winning and Losing ~
-            Using some methods from  α-ß pruning:
-                game_state.is_win() → return +∞
-                game_state.is_lose() → return -∞
-
-            This should result in a greater weight put in towards winning.
-
-      ~ Part II - Eating Food ~
-            The shorter the game is, the less the chance for death,
-            so if you can eat you should.
-
-                first - find the closest food distance.
-
-
-      ~ Part III - Distance to Ghosts ~
-            Generally, it is better to just stay away from the
-            closest ghost
-            I.E. : Don't run into a ghost right next to you
-
-     ~ Part IV - Object Counts ~
-           The more options that we have left, the more we shoold change
-
-      ~ Part V - Combination ~
-            Add things together into one score.
-            Weight things in order to get better behavior
-
+      DESCRIPTION: Prioritizes states in which food is close and ghosts are far.
+      Food becomes more valuable as its scarcity increases.
 
     """
     "*** YOUR CODE HERE ***"
@@ -374,17 +345,20 @@ def better_evaluation_function(current_game_state):
     new_pos = current_game_state.get_pacman_position()
     new_food = current_game_state.get_food()
 
+    # Compute distances to foods
     new_food_positions = current_game_state.get_food().as_list()
     new_food_distances = [ manhattan_distance(food_pos, new_pos) for food_pos in new_food_positions ]
+
+    # Compute distances to ghosts
     new_ghost_positions = [ ghost.get_position() for ghost in new_ghost_states if ghost.scared_timer > 0 ]
     new_ghost_distances = [ manhattan_distance(ghost_pos, new_pos) for ghost_pos in new_ghost_positions ]
 
     evaluation = score
     if new_food_distances:
-        # Reduce: Find closest food and compute bonus with inverse relation to distance
+        # Bonus for minimizing distance to closest food, improves with food scarcity
         evaluation += 10/(min(new_food_distances)+1) * 5/(len(new_food_distances)+1)
     if new_ghost_distances:
-        # Reduce: Find closest ghost and compute penalty with inverse relation to distance
+        # Penalty for minimizing distance to closest ghost
         evaluation -= 15/(min(new_ghost_distances)+1)
     return evaluation
 
