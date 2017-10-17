@@ -275,11 +275,9 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             return self.evaluation_function(game_state)
 
         legal_actions = game_state.get_legal_actions(0)
-        prefer_action = Directions.STOP
-        score = -(float("inf"))
+        score = -sys.maxsize - 1
 
         for action in legal_actions:
-            prev_score = score
             next_state = game_state.generate_successor(0, action)
             score = max(score, self.get_expected(next_state, 1, depth))
         return score
@@ -288,19 +286,18 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         if game_state.is_win() or game_state.is_lose() or depth is 0:
             return self.evaluation_function(game_state)
 
-        number_ghosts = game_state.get_num_agents() - 1
+        number_of_ghosts = game_state.get_num_agents() - 1
         legal_actions = game_state.get_legal_actions(index)
-        numbe_actions = len(legal_actions)
-        total_val = 0
+        number_of_actions = len(legal_actions)
+        total_value = 0
 
         for action in legal_actions:
             next_state = game_state.generate_successor(index, action)
-            if index is number_ghosts:
-                total_val += self.get_max(next_state, depth - 1)
+            if index is number_of_ghosts:
+                total_value += self.get_max(next_state, depth - 1)
             else:
-                total_val += self.get_expected(next_state, index + 1, depth)
-
-        return total_val / numbe_actions
+                total_value += self.get_expected(next_state, index + 1, depth)
+        return total_value / number_of_actions
 
     def get_action(self, game_state):
         """
@@ -315,13 +312,13 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
 
         legal_actions = game_state.get_legal_actions(0)
         prefer_action = Directions.STOP
-        score = -(float("inf"))
+        score = -sys.maxsize - 1
 
         for action in legal_actions:
             next_state = game_state.generate_successor(0, action)
-            prev_score = score
+            previous_score = score
             score = max(score, self.get_expected(next_state, 1, self.depth))
-            if score > prev_score:
+            if score > previous_score:
                 prefer_action = action
         return prefer_action
 
