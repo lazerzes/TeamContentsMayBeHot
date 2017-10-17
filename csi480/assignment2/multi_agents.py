@@ -270,6 +270,38 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       Your expectimax agent (question 4)
     """
 
+    def get_max(self, game_state, depth):
+        if game_state.is_win() or game_state.is_lose() or depth is 0:
+            return self.evaluation_function(game_state)
+
+        legal_actions = game_state.get_legal_actions(0)
+        prefer_action = Directions.STOP
+        score = -(float("inf"))
+
+        for action in legal_actions:
+            prev_score = score
+            next_state = game_state.generate_successor(0, action)
+            score = max(score, self.get_expected(next_state, 1, depth))
+        return score
+
+    def get_expected(self, game_state, index, depth):
+        if game_state.is_win() or game_state.is_lose() or depth is 0:
+            return self.evaluation_function(game_state)
+
+        number_ghosts = game_state.get_num_agents() - 1
+        legal_actions = game_state.get_legal_actions(index)
+        numbe_actions = len(legal_actions)
+        total_val = 0
+
+        for action in legal_actions:
+            next_state = game_state.generate_successor(index, action)
+            if index is number_ghosts:
+                total_val += self.get_max(next_state, depth - 1)
+            else:
+                total_val += self.get_expected(next_state, index + 1, depth)
+
+        return total_val / numbe_actions
+
     def get_action(self, game_state):
         """
           Returns the expectimax action using self.depth and self.evaluation_function
@@ -278,40 +310,6 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           legal moves.
         """
         "*** YOUR CODE HERE ***"
-
-        def get_max(game_state, depth):
-            if game_state.is_win() or game_state.is_lose() or depth is 0:
-                return self.evaluation_function(game_state)
-
-            legal_actions = game_state.get_legal_actions(0)
-            prefer_action = Directions.STOP
-            score = -(float("inf"))
-
-            for action in legal_actions:
-                prev_score = score
-                next_state = game_state.generate_successor(0, action)
-                score = max(score, get_expected(next_state, 1, depth))
-            return score
-
-        def get_expected(game_state, index, depth):
-            if game_state.is_win() or game_state.is_lose() or depth is 0:
-                return self.evaluation_function(game_state)
-
-            number_ghosts = game_state.get_num_agents() - 1
-            legal_actions = game_state.get_legal_actions(index)
-            numbe_actions = len(legal_actions)
-            total_val = 0
-
-            for action in legal_actions:
-                next_state = game_state.generate_successor(index, action)
-                if index is number_ghosts:
-                    total_val += get_max(next_state, depth - 1)
-                else:
-                    total_val += get_expected(next_state, index + 1, depth)
-
-            return total_val / numbe_actions
-
-        " Main Function (kinda)"
         if(game_state.is_win() or game_state.is_lose()):
             return self.evaluation_function(game_state)
 
@@ -322,11 +320,9 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         for action in legal_actions:
             next_state = game_state.generate_successor(0, action)
             prev_score = score
-            score = max(score, get_expected(next_state, 1, self.depth))
+            score = max(score, self.get_expected(next_state, 1, self.depth))
             if score > prev_score:
                 prefer_action = action
-
-
         return prefer_action
 
 
