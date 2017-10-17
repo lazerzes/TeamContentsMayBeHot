@@ -223,10 +223,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         if agent == 0:
             value = ('None', -sys.maxsize - 1)
             for action, successor in successors:
-                new_value = self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1]
-                new_value = (action, new_value)
+                new_value = (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1])
                 value = max(value, new_value, key=lambda x: x[1])
-                if value[1] >= beta:
+                if value[1] > beta:
                     return value
                 alpha = max(alpha, value[1])
             return value
@@ -234,10 +233,9 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         # Otherwise minimize
         value = ('None', sys.maxsize)
         for action, successor in successors:
-            new_value = self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1]
-            new_value = (action, new_value)
+            new_value = (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1])
             value = min(value, new_value, key=lambda x: x[1])
-            if value[1] <= alpha:
+            if value[1] < alpha:
                 return value
             beta = min(beta, value[1])
         return value
