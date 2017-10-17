@@ -1,5 +1,27 @@
 """multi_agents.py
 
+Author: Rei Armenia, Matthew James Harrison
+Class: CSI-480 AI
+Assignment: Multi-Agent Pacman Programming Assignment
+Due Date: October 16, 2017
+
+Description:
+Pacman, now with ghosts.
+Minimax, Expectimax,
+Evaluation. 
+
+Certification of Authenticity:
+I certify that this is entirely my own work, except where I have given 
+fully-documented references to the work of others. I understand the definition 
+and consequences of plagiarism and acknowledge that the assessor of this
+assignment may, for the purpose of assessing this assignment:
+ - Reproduce this assignment and provide a copy to another member of academic
+   staff; and/or
+ - Communicate a copy of this assignment to a plagiarism checking service 
+   (which may then retain a copy of this assignment on its database for the 
+   purpose of future plagiarism checking)
+
+----------------------
 Champlain College CSI-480, Fall 2017
 The following code was adapted by Joshua Auerbach (jauerbach@champlain.edu)
 from the UC Berkeley Pacman Projects (see license and attribution below).
@@ -163,7 +185,7 @@ class MinimaxAgent(MultiAgentSearchAgent):
         # Create tuples of related actions and values: (action, value)
         successors = zip(actions, values)
 
-        # Maximize if player or else minimize
+        # Maximize if player or else minimize, returning tuple: (action, value)
         if agent == 0:
             return max(successors, key=lambda x: x[1])
         return min(successors, key=lambda x: x[1])
@@ -206,8 +228,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         if not actions:
             return ('Stop', self.evaluation_function(state))
 
-        # Get all successors
-        successors = [ state.generate_successor(agent, action) for action in actions ]
+        # Get all actions paired with their successors
+        successors = [ (action, state.generate_successor(agent, action)) for action in actions ]
         
         # Increment agent (with wrapping) and increment depth when all agents have acted
         next_agent = agent+1
@@ -216,25 +238,20 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             next_agent = 0
             next_depth += 1
             
-        # Create tuples of related actions and successor states: (action, state)
-        successors = zip(actions, successors)
-        
-        # Maximize if player
+        # Maximize if player, returning tuple: (action, value)
         if agent == 0:
-            value = ('None', -sys.maxsize - 1)
+            value = ('Stop', -sys.maxsize - 1)
             for action, successor in successors:
-                new_value = (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1])
-                value = max(value, new_value, key=lambda x: x[1])
+                value = max(value, (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1]), key=lambda x: x[1])
                 if value[1] > beta:
                     return value
                 alpha = max(alpha, value[1])
             return value
             
-        # Otherwise minimize
-        value = ('None', sys.maxsize)
+        # Or else minimize, returning tuple: (action, value)
+        value = ('Stop', sys.maxsize)
         for action, successor in successors:
-            new_value = (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1])
-            value = min(value, new_value, key=lambda x: x[1])
+            value = min(value, (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1]), key=lambda x: x[1])
             if value[1] < alpha:
                 return value
             beta = min(beta, value[1])
