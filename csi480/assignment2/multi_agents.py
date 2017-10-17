@@ -136,18 +136,12 @@ class MinimaxAgent(MultiAgentSearchAgent):
     """
 
     def minimax(self, state, depth, agent):
-        tab = ''
-        for i in range(0, depth):
-            tab += ' | '
-        print(tab + 'Depth:', depth, '/', self.depth)
-
         # Check if depth reached
         if depth == self.depth:
             return ('Stop', self.evaluation_function(state))
 
         # Get all actions
         actions = state.get_legal_actions(agent)
-        print(tab + 'Actions:', actions)
 
         # Check if terminal state
         if not actions:
@@ -165,8 +159,6 @@ class MinimaxAgent(MultiAgentSearchAgent):
         
         # Recurse for each successor to compute their values, incrementing agent index and depth
         values = [ self.minimax(successor, next_depth, next_agent)[1] for successor in successors ]
-        print(tab + 'Values:', values)
-        print(tab)
 
         # Create tuples of related actions and values: (action, value)
         successors = zip(actions, values)
@@ -202,12 +194,60 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       Your minimax agent with alpha-beta pruning (question 3)
     """
 
+    def ab_minimax(self, state, depth, agent, alpha, beta):
+        # Check if depth reached
+        if depth == self.depth:
+            return ('Stop', self.evaluation_function(state))
+
+        # Get all actions
+        actions = state.get_legal_actions(agent)
+
+        # Check if terminal state
+        if not actions:
+            return ('Stop', self.evaluation_function(state))
+
+        # Get all successors
+        successors = [ state.generate_successor(agent, action) for action in actions ]
+        
+        # Increment agent (with wrapping) and increment depth when all agents have acted
+        next_agent = agent+1
+        next_depth = depth
+        if next_agent >= state.get_num_agents():
+            next_agent = 0
+            next_depth += 1
+            
+        # Create tuples of related actions and successor states: (action, state)
+        successors = zip(actions, successors)
+        
+        # Maximize if player
+        if agent == 0:
+            value = ('None', -sys.maxsize - 1)
+            for action, successor in successors:
+                new_value = self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1]
+                new_value = (action, new_value)
+                value = max(value, new_value, key=lambda x: x[1])
+                if value[1] >= beta:
+                    return value
+                alpha = max(alpha, value[1])
+            return value
+        # Otherwise minimize
+        value = ('None', sys.maxsize)
+        for action, successor in successors:
+            new_value = self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1]
+            new_value = (action, new_value)
+            value = min(value, new_value, key=lambda x: x[1])
+            if value[1] <= alpha:
+                return value
+            beta = min(beta, value[1])
+        return value
+
     def get_action(self, game_state):
         """
           Returns the minimax action using self.depth and self.evaluation_function
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        
+        return self.ab_minimax(game_state, 0, 0, -sys.maxsize - 1, sys.maxsize)[0]
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
