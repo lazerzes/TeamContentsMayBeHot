@@ -228,9 +228,6 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         if not actions:
             return ('Stop', self.evaluation_function(state))
 
-        # Get all actions paired with their successors
-        successors = [ (action, state.generate_successor(agent, action)) for action in actions ]
-
         # Increment agent (with wrapping) and increment depth when all agents have acted
         next_agent = agent+1
         next_depth = depth
@@ -241,7 +238,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         # Maximize if player, returning tuple: (action, value)
         if agent == 0:
             value = ('Stop', -sys.maxsize - 1)
-            for action, successor in successors:
+            for action in actions:
+                successor = state.generate_successor(agent, action)
                 tmp = (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1])
                 value = max(value, tmp, key=lambda x: x[1])
                 if value[1] > beta:
@@ -250,7 +248,8 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             return value
         # Or else minimize, returning tuple: (action, value)
         value = ('Stop', sys.maxsize)
-        for action, successor in successors:
+        for action in actions:
+            successor = state.generate_successor(agent, action)
             tmp = (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1])
             value = min(value, tmp, key=lambda x: x[1])
             if value[1] < alpha:
