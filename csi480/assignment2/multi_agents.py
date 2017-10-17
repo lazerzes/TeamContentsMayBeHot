@@ -230,6 +230,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
                     return value
                 alpha = max(alpha, value[1])
             return value
+            
         # Otherwise minimize
         value = ('None', sys.maxsize)
         for action, successor in successors:
