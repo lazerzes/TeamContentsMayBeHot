@@ -8,17 +8,17 @@ Due Date: October 16, 2017
 Description:
 Pacman, now with ghosts.
 Minimax, Expectimax,
-Evaluation. 
+Evaluation.
 
 Certification of Authenticity:
-I certify that this is entirely my own work, except where I have given 
-fully-documented references to the work of others. I understand the definition 
+I certify that this is entirely my own work, except where I have given
+fully-documented references to the work of others. I understand the definition
 and consequences of plagiarism and acknowledge that the assessor of this
 assignment may, for the purpose of assessing this assignment:
  - Reproduce this assignment and provide a copy to another member of academic
    staff; and/or
- - Communicate a copy of this assignment to a plagiarism checking service 
-   (which may then retain a copy of this assignment on its database for the 
+ - Communicate a copy of this assignment to a plagiarism checking service
+   (which may then retain a copy of this assignment on its database for the
    purpose of future plagiarism checking)
 
 ----------------------
@@ -171,14 +171,14 @@ class MinimaxAgent(MultiAgentSearchAgent):
 
         # Get all successors
         successors = [ state.generate_successor(agent, action) for action in actions ]
-        
+
         # Increment agent (with wrapping) and increment depth when all agents have acted
         next_agent = agent+1
         next_depth = depth
         if next_agent >= state.get_num_agents():
             next_agent = 0
             next_depth += 1
-        
+
         # Recurse for each successor to compute their values, incrementing agent index and depth
         values = [ self.minimax(successor, next_depth, next_agent)[1] for successor in successors ]
 
@@ -230,28 +230,29 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
         # Get all actions paired with their successors
         successors = [ (action, state.generate_successor(agent, action)) for action in actions ]
-        
+
         # Increment agent (with wrapping) and increment depth when all agents have acted
         next_agent = agent+1
         next_depth = depth
         if next_agent >= state.get_num_agents():
             next_agent = 0
             next_depth += 1
-            
+
         # Maximize if player, returning tuple: (action, value)
         if agent == 0:
             value = ('Stop', -sys.maxsize - 1)
             for action, successor in successors:
-                value = max(value, (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1]), key=lambda x: x[1])
+                tmp = (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1])
+                value = max(value, tmp, key=lambda x: x[1])
                 if value[1] > beta:
                     return value
                 alpha = max(alpha, value[1])
             return value
-            
         # Or else minimize, returning tuple: (action, value)
         value = ('Stop', sys.maxsize)
         for action, successor in successors:
-            value = min(value, (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1]), key=lambda x: x[1])
+            tmp = (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1])
+            value = min(value, tmp, key=lambda x: x[1])
             if value[1] < alpha:
                 return value
             beta = min(beta, value[1])
@@ -262,7 +263,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
           Returns the minimax action using self.depth and self.evaluation_function
         """
         "*** YOUR CODE HERE ***"
-        
+
         return self.ab_minimax(game_state, 0, 0, -sys.maxsize - 1, sys.maxsize)[0]
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
