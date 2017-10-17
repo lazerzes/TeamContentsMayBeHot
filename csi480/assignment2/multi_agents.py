@@ -240,7 +240,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
             value = ('Stop', -sys.maxsize - 1)
             for action in actions:
                 successor = state.generate_successor(agent, action)
-                tmp = (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1])
+                tmp = ( action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1] )
                 value = max(value, tmp, key=lambda x: x[1])
                 if value[1] > beta:
                     return value
@@ -250,7 +250,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         value = ('Stop', sys.maxsize)
         for action in actions:
             successor = state.generate_successor(agent, action)
-            tmp = (action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1])
+            tmp = ( action, self.ab_minimax(successor, next_depth, next_agent, alpha, beta)[1] )
             value = min(value, tmp, key=lambda x: x[1])
             if value[1] < alpha:
                 return value
