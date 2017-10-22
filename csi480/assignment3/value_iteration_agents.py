@@ -55,9 +55,18 @@ class ValueIterationAgent(ValueEstimationAgent):
         "*** YOUR CODE HERE ***"
         for i in range(0, iterations):
             for state in mdp.get_states():
-                actions = mdp.get_possible_actions(state)
-                q_values = [ self.compute_q_value_from_values(state, action) for action in actions ]
-                print(q_values)
+                sums = []
+                for action in mdp.get_possible_actions(state):
+                    new_values = []
+                    for new_state, probability in mdp.get_transition_states_and_probs(state, action):
+                        reward = mdp.get_reward(state, action, new_state)
+                        value = reward + (discount * self.get_value(new_state))
+                        value *= probability
+                        new_values.append(value)
+                    if new_values:
+                        sums.append(sum(new_values))
+                if sums:
+                    self.states[state] = max(sums)
 
     def get_value(self, state):
         """
@@ -71,11 +80,7 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        t_and_p = self.mdp.get_transition_states_and_probs(state, action)
-        print(state, action, t_and_p)
-        return 0
-        reward = self.mdp.get_reward(state, action, successor)
-        return probability * ( reward + (self.discount * self.get_value(successor)) )
+        util.raise_not_defined()
 
     def compute_action_from_values(self, state):
         """
@@ -87,9 +92,15 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
+        values = []
         actions = self.mdp.get_possible_actions(state)
         for action in actions:
-            pass
+            for new_state, probability in self.mdp.get_transition_states_and_probs(state, action):
+                values.append(self.get_value(new_state))
+            values = zip(actions, values)
+        if values:
+            return max(values, key=lambda x: x[1])[0]
+        return 'Stop'
 
     def get_policy(self, state):
         return self.compute_action_from_values(state)
