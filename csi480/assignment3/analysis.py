@@ -34,18 +34,18 @@ def question2():
 
 # Prefer the close exit (+1), risking the cliff (-10)
 def question3a():
-    answer_discount = None
-    answer_noise = None
-    answer_living_reward = None
+    answer_discount = 0.1
+    answer_noise = 0.0
+    answer_living_reward = 0.0
     return answer_discount, answer_noise, answer_living_reward
 
     # If not possible, return 'NOT POSSIBLE'
 
 # Prefer the close exit (+1), but avoiding the cliff (-10)
 def question3b():
-    answer_discount = None
-    answer_noise = None
-    answer_living_reward = None
+    answer_discount = 0.5
+    answer_noise = 0.9
+    answer_living_reward = 0
     return answer_discount, answer_noise, answer_living_reward
 
     # If not possible, return 'NOT POSSIBLE'
