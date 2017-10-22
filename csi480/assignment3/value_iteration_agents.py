@@ -53,9 +53,14 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-		for state in mdp.get_states():
-			for k in range(0, iterations):
-				v = sum([  ])
+        print('Discount:', self.discount)
+        print('Iterations:', self.iterations)
+        print('Values (Counter):', self.values)
+
+        for state in mdp.get_states():
+            for action in mdp.get_possible_actions(state):
+                t_and_r = mdp.get_transition_states_and_probs(state, action)
+                print(state, action, t_and_r)
 
     def get_value(self, state):
         """
@@ -69,9 +74,7 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        transition = self.mdp.get_transition_states_and_probs(state, action)
-		reward = self.mdp.get_reward(state, action, )
-		
+        return 0
 
     def compute_action_from_values(self, state):
         """
