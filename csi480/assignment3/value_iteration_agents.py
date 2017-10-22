@@ -54,19 +54,10 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
         for i in range(0, iterations):
-            for state in mdp.get_states():
-                sums = []
-                for action in mdp.get_possible_actions(state):
-                    new_values = []
-                    for new_state, probability in mdp.get_transition_states_and_probs(state, action):
-                        reward = mdp.get_reward(state, action, new_state)
-                        value = reward + (discount * self.get_value(new_state))
-                        value *= probability
-                        new_values.append(value)
-                    if new_values:
-                        sums.append(sum(new_values))
-                if sums:
-                    self.states[state] = max(sums)
+            for state in self.mdp.get_states():
+                q_values = [ self.compute_q_value_from_values(state, action) for action in mdp.get_possible_actions(state) ]
+                if q_values:
+                    self.values[state] = max(q_values)
 
     def get_value(self, state):
         """
@@ -80,7 +71,13 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        new_values = []
+        for new_state, probability in self.mdp.get_transition_states_and_probs(state, action):
+            reward = self.mdp.get_reward(state, action, new_state)
+            value = reward + (self.discount * self.get_value(new_state))
+            value *= probability
+            new_values.append(value)
+        return sum(new_values)
 
     def compute_action_from_values(self, state):
         """
@@ -97,8 +94,8 @@ class ValueIterationAgent(ValueEstimationAgent):
         for action in actions:
             for new_state, probability in self.mdp.get_transition_states_and_probs(state, action):
                 values.append(self.get_value(new_state))
-            values = zip(actions, values)
         if values:
+            values = zip(actions, values)
             return max(values, key=lambda x: x[1])[0]
         return 'Stop'
 
