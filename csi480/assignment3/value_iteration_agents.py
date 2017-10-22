@@ -53,14 +53,11 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-        print('Discount:', self.discount)
-        print('Iterations:', self.iterations)
-        print('Values (Counter):', self.values)
-
-        for state in mdp.get_states():
-            for action in mdp.get_possible_actions(state):
-                t_and_r = mdp.get_transition_states_and_probs(state, action)
-                print(state, action, t_and_r)
+        for i in range(0, iterations):
+            for state in mdp.get_states():
+                actions = mdp.get_possible_actions(state)
+                q_values = [ self.compute_q_value_from_values(state, action) for action in actions ]
+                print(q_values)
 
     def get_value(self, state):
         """
@@ -74,7 +71,11 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
+        t_and_p = self.mdp.get_transition_states_and_probs(state, action)
+        print(state, action, t_and_p)
         return 0
+        reward = self.mdp.get_reward(state, action, successor)
+        return probability * ( reward + (self.discount * self.get_value(successor)) )
 
     def compute_action_from_values(self, state):
         """
@@ -86,7 +87,9 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        actions = self.mdp.get_possible_actions(state)
+        for action in actions:
+            pass
 
     def get_policy(self, state):
         return self.compute_action_from_values(state)
