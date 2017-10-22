@@ -24,12 +24,15 @@ Pieter Abbeel (pabbeel@cs.berkeley.edu).
 # Set the given parameters to obtain the specified policies through
 # value iteration.
 
+# Change only ONE of the discount and noise parameters so that the optimal
+# policy causes the agent to attempt to cross the bridge.
 def question2():
     answer_discount = 0.9
     answer_noise = 0.0
     return answer_discount, answer_noise
 
 
+# Prefer the close exit (+1), risking the cliff (-10)
 def question3a():
     answer_discount = None
     answer_noise = None
@@ -38,6 +41,7 @@ def question3a():
 
     # If not possible, return 'NOT POSSIBLE'
 
+# Prefer the close exit (+1), but avoiding the cliff (-10)
 def question3b():
     answer_discount = None
     answer_noise = None
@@ -46,6 +50,7 @@ def question3b():
 
     # If not possible, return 'NOT POSSIBLE'
 
+# Prefer the distant exit (+10), risking the cliff (-10)
 def question3c():
     answer_discount = None
     answer_noise = None
@@ -54,6 +59,7 @@ def question3c():
 
     # If not possible, return 'NOT POSSIBLE'
 
+# Prefer the distant exit (+10), avoiding the cliff (-10)
 def question3d():
     answer_discount = None
     answer_noise = None
@@ -62,6 +68,7 @@ def question3d():
 
     # If not possible, return 'NOT POSSIBLE'
 
+# Avoid both exits and the cliff (so an episode should never terminate)
 def question3e():
     answer_discount = None
     answer_noise = None
