@@ -89,7 +89,7 @@ class ValueIterationAgent(ValueEstimationAgent):
         new_values = []
         for new_state, probability in self.mdp.get_transition_states_and_probs(state, action):
             reward = self.mdp.get_reward(state, action, new_state)
-            value = probability * reward + (self.discount * self.get_value(new_state))
+            value = probability * (reward + (self.discount * self.get_value(new_state)))
             new_values.append(value)
         return sum(new_values)
 
