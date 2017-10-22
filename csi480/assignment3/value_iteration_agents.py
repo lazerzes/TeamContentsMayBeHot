@@ -102,9 +102,9 @@ class ValueIterationAgent(ValueEstimationAgent):
             return 'Stop'
 
         q_values = [(action, self.compute_q_value_from_values(state, action)) for action in actions]
-        policy = max(q_values, key=lambda x:x[1])
-        self.policy[policy[1]] = policy[0]
-        return policy[0]
+        action, state = max(q_values, key=lambda x:x[1])
+        self.policy[state] = action
+        return action
 
     def get_policy(self, state):
         return self.compute_action_from_values(state)
