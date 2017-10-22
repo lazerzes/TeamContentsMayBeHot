@@ -62,17 +62,7 @@ class ValueIterationAgent(ValueEstimationAgent):
                 q_values = [self.compute_q_value_from_values(state, action) for action in actions]
                 values[state] = max(q_values)
             self.values = values.copy()
-
         self.policy = {}
-        for state in mdp.get_states():
-            actions = mdp.get_possible_actions(state)
-            if not actions:
-                self.policy[state] = 'Stop'
-                continue
-            new_states = [mdp.get_transition_states_and_probs(state, action)[0] for action in actions]
-            values = [self.get_value(new_state) for new_state in new_states]
-            values = zip(actions, values)
-            self.policy[state] = max(values, key=lambda x:x[1])[0]
 
     def get_value(self, state):
         """
@@ -103,7 +93,18 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        return self.policy[state]
+        if state in self.policy.keys():
+            return self.policy[state]
+
+        actions = self.mdp.get_possible_actions(state)
+        if not actions:
+            self.policy[state] = 'Stop'
+            return 'Stop'
+
+        q_values = [(action, self.compute_q_value_from_values(state, action)) for action in actions]
+        policy = max(q_values, key=lambda x:x[1])
+        self.policy[policy[1]] = policy[0]
+        return policy[0]
 
     def get_policy(self, state):
         return self.compute_action_from_values(state)
