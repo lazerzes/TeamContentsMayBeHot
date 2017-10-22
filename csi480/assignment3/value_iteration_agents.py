@@ -54,13 +54,25 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
         for i in range(0, iterations):
-            values = self.values
-            for state in self.mdp.get_states():
-                actions = self.mdp.get_possible_actions(state)
+            values = self.values.copy()
+            for state in mdp.get_states():
+                actions = mdp.get_possible_actions(state)
                 if not actions:
                     continue
                 q_values = [self.compute_q_value_from_values(state, action) for action in actions]
-                self.values[state] = max(q_values)
+                values[state] = max(q_values)
+            self.values = values.copy()
+
+        self.policy = {}
+        for state in mdp.get_states():
+            actions = mdp.get_possible_actions(state)
+            if not actions:
+                self.policy[state] = 'Stop'
+                continue
+            new_states = [mdp.get_transition_states_and_probs(state, action)[0] for action in actions]
+            values = [self.get_value(new_state) for new_state in new_states]
+            values = zip(actions, values)
+            self.policy[state] = max(values, key=lambda x:x[1])[0]
 
     def get_value(self, state):
         """
@@ -77,7 +89,7 @@ class ValueIterationAgent(ValueEstimationAgent):
         new_values = []
         for new_state, probability in self.mdp.get_transition_states_and_probs(state, action):
             reward = self.mdp.get_reward(state, action, new_state)
-            value = probability * (reward + (self.discount * self.get_value(new_state)))
+            value = probability * reward + (self.discount * self.get_value(new_state))
             new_values.append(value)
         return sum(new_values)
 
@@ -91,17 +103,7 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        values = []
-
-        actions = self.mdp.get_possible_actions(state)
-        if not actions:
-            return 'None'
-
-        for action in actions:
-            for new_state, probability in self.mdp.get_transition_states_and_probs(state, action):
-                values.append(self.get_value(new_state))
-        values = zip(actions, values)
-        return max(values, key=lambda x: x[1])[0]
+        return self.policy[state]
 
     def get_policy(self, state):
         return self.compute_action_from_values(state)
