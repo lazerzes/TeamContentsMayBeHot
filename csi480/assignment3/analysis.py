@@ -43,8 +43,8 @@ def question3a():
 
 # Prefer the close exit (+1), but avoiding the cliff (-10)
 def question3b():
-    answer_discount = 0.5
-    answer_noise = 0.9
+    answer_discount = 0.1
+    answer_noise = 0.1
     answer_living_reward = 0
     return answer_discount, answer_noise, answer_living_reward
 
