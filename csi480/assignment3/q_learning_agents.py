@@ -72,11 +72,10 @@ class QLearningAgent(ReinforcementAgent):
         """
         "*** YOUR CODE HERE ***"
         max_q = 0.0
-        actions = self.get_legal_actions(state)
-        if not actions:
-            max_q = 0.0
-        else:
-            max_q = max([self.get_q_value(state, action) for action in actions])
+        legal_actions = self.get_legal_actions(state)
+        if legal_actions:
+            q_values = [self.get_q_value(state, action) for action in legal_actions]
+            max_q = max(q_values)
         return max_q
 
     def compute_action_from_q_values(self, state):
@@ -88,10 +87,10 @@ class QLearningAgent(ReinforcementAgent):
         "*** YOUR CODE HERE ***"
         # Return none if terminal state
         best_action = None
-        actions = self.get_legal_actions(state)
-        if actions:
-            q_values = [self.get_q_value(state, action) for action in actions]
-            actions_and_q_values = zip(actions, q_values)
+        legal_actions = self.get_legal_actions(state)
+        if legal_actions:
+            q_values = [self.get_q_value(state, action) for action in legal_actions]
+            actions_and_q_values = zip(legal_actions, q_values)
             best_action = max(actions_and_q_values, key=lambda x: x[1])[0]
         return best_action
 
@@ -112,7 +111,7 @@ class QLearningAgent(ReinforcementAgent):
         "*** YOUR CODE HERE ***"
         if legal_actions:
             if util.flip_coin(self.epsilon):
-                action = self.compute_value_from_q_values(state)
+                action = self.compute_action_from_q_values(state)
             else:
                 action = random.choice(legal_actions)
         return action
@@ -127,9 +126,13 @@ class QLearningAgent(ReinforcementAgent):
           it will be called on your behalf
         """
         "*** YOUR CODE HERE ***"
-        next_action = self.get_action(next_state)
-        sample = reward + (self.discount * self.get_q_value(next_state, next_action))
-        return ((1 - self.alpha) * self.get_q_value(state, action)) + (self.alpha * sample)
+        old_q_value = self.get_q_value(state, action)
+        next_value = self.compute_value_from_q_values(next_state)
+
+        sample = reward + (self.discount * next_value)
+        new_q_value = ((1 - self.alpha) * old_q_value) + (self.alpha * sample)
+
+        self.q_values[(state, action)] = new_q_value
 
     def get_policy(self, state):
         return self.compute_action_from_q_values(state)
