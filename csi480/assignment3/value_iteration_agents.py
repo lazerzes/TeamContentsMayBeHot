@@ -96,15 +96,14 @@ class ValueIterationAgent(ValueEstimationAgent):
         if state in self.policy.keys():
             return self.policy[state]
 
-        actions = self.mdp.get_possible_actions(state)
-        if not actions:
-            self.policy[state] = 'Stop'
-            return 'Stop'
+        best_action = None
 
-        q_values = [(action, self.compute_q_value_from_values(state, action)) for action in actions]
-        action, state = max(q_values, key=lambda x:x[1])
-        self.policy[state] = action
-        return action
+        actions = self.mdp.get_possible_actions(state)
+        if actions:
+            q_values = [(action, self.compute_q_value_from_values(state, action)) for action in actions]
+            best_action, state = max(q_values, key=lambda x:x[1])
+        self.policy[state] = best_action
+        return best_action
 
     def get_policy(self, state):
         return self.compute_action_from_values(state)
