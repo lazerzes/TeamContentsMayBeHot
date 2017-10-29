@@ -91,7 +91,11 @@ class QLearningAgent(ReinforcementAgent):
         if legal_actions:
             q_values = [self.get_q_value(state, action) for action in legal_actions]
             actions_and_q_values = zip(legal_actions, q_values)
-            best_action = max(actions_and_q_values, key=lambda x: x[1])[0]
+            best_action, best_q_value = max(actions_and_q_values, key=lambda x: x[1])
+
+            tied_actions = [(action, q_value) for action, q_value in actions_and_q_values if (q_value == best_q_value or q_value == 0.0)]
+            if len(tied_actions) > 1:
+                best_action = random.choice(tied_actions)[0]
         return best_action
 
     def get_action(self, state):
@@ -127,9 +131,9 @@ class QLearningAgent(ReinforcementAgent):
         """
         "*** YOUR CODE HERE ***"
         old_q_value = self.get_q_value(state, action)
-        next_value = self.compute_value_from_q_values(next_state)
+        estimated_next_value = self.compute_value_from_q_values(next_state)
+        sample = reward + (self.discount * estimated_next_value)
 
-        sample = reward + (self.discount * next_value)
         new_q_value = ((1 - self.alpha) * old_q_value) + (self.alpha * sample)
 
         self.q_values[(state, action)] = new_q_value
