@@ -52,6 +52,7 @@ class QLearningAgent(ReinforcementAgent):
         ReinforcementAgent.__init__(self, **args)
 
         "*** YOUR CODE HERE ***"
+        self.q_values = util.Counter()
 
     def get_q_value(self, state, action):
         """
@@ -60,7 +61,7 @@ class QLearningAgent(ReinforcementAgent):
           or the Q node value otherwise
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        return self.q_values[(state, action)]
 
     def compute_value_from_q_values(self, state):
         """
@@ -70,7 +71,10 @@ class QLearningAgent(ReinforcementAgent):
           terminal state, you should return a value of 0.0.
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        actions = self.get_legal_actions(state)
+        if not actions:
+            return None
+        return sum([self.get_q_value(state, action) for action in actions])
 
     def compute_action_from_q_values(self, state):
         """
@@ -79,7 +83,15 @@ class QLearningAgent(ReinforcementAgent):
           you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        actions = self.get_legal_actions(state)
+        if not actions:
+            return None
+        q_values = [self.compute_q_value_from_values(state, action) for action in actions]
+        actions_and_q_values = zip(actions, q_values).sort(key=lambda x: x[1])
+        best_choice = max(actions_and_q_values, key=lambda x: x[1])
+        tied_for_best = filter(choice for choice in actions_and_q_values if choice[1] == best_choice[1])
+        tied_for_best = [action for action, q_value in tied_for_best] # unzip
+        return random.choice(tied_for_best)
 
     def get_action(self, state):
         """
