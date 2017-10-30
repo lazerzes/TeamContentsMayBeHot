@@ -73,12 +73,11 @@ class QLearningAgent(ReinforcementAgent):
           terminal state, you should return a value of 0.0.
         """
         "*** YOUR CODE HERE ***"
-        max_q = 0.0
-        legal_actions = self.get_legal_actions(state)
-        if legal_actions:
-            q_values = [self.get_q_value(state, action) for action in legal_actions]
-            max_q = max(q_values)
-        return max_q
+        q_values = [self.get_q_value(state, action) for action in self.get_legal_actions(state)]
+        if not (q_values):
+            return 0.0
+        else:
+            return max(q_values)
 
     def compute_action_from_q_values(self, state):
         """
@@ -88,17 +87,13 @@ class QLearningAgent(ReinforcementAgent):
         """
         "*** YOUR CODE HERE ***"
         # Return none if terminal state
-        best_action = None
-        legal_actions = self.get_legal_actions(state)
-        if legal_actions:
-            q_values = [self.get_q_value(state, action) for action in legal_actions]
-            actions_and_q_values = zip(legal_actions, q_values)
-            best_action, best_q_value = max(actions_and_q_values, key=lambda x: x[1])
+        best_value = self.get_value(state)
+        best_actions = [action for action in self.get_legal_actions(state) if self.get_q_value(state, action) is best_value]
 
-            tied_actions = [(action, q_value) for action, q_value in actions_and_q_values if (q_value == best_q_value or q_value == 0.0)]
-            if len(tied_actions) > 1:
-                best_action = random.choice(tied_actions)[0]
-        return best_action
+        if not len(best_actions):
+            return None
+        else:
+            return random.choice(best_actions)
 
     def get_action(self, state):
         """
