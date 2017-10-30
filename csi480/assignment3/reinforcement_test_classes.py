@@ -636,7 +636,7 @@ class Question6Test(test_classes.TestCase):
 
     def execute(self, grades, module_dict, solution_dict):
         student_solution = module_dict['analysis'].question6()
-        student_solution = str(student_solution).strip().lower()
+        student_solution = str(student_solution).strip().lower().encode('utf-8')
         hashed_solution = sha1(student_solution).hexdigest()
         if hashed_solution == '46729c96bb1e4081fdc81a8ff74b3e5db8fba415':
             return self.test_pass(grades)

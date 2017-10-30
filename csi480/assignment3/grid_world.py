@@ -174,7 +174,7 @@ class GridWorld(mdp.MarkovDecisionProcess):
         for state, prob in states_and_probs:
             counter[state] += prob
         new_states_and_probs = []
-        for state, prob in list(counter.items()):
+        for state, prob in sorted(list(counter.items())):
             new_states_and_probs.append((state, prob))
         return new_states_and_probs
 
