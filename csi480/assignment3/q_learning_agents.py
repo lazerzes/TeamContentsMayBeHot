@@ -1,5 +1,27 @@
 """q_learning_agents.py
 
+Author: Rei Armenia, Matthew James Harrison
+Class: CSI-480 AI
+Assignment: MDPs and Reinforcement Learning Programming Assignment
+Due Date: November 1, 2017
+
+Description:
+Pacman seeks reward.
+Should he eat or should he run?
+When in doubt, Q-learn.
+
+Certification of Authenticity:
+I certify that this is entirely my own work, except where I have given
+fully-documented references to the work of others. I understand the definition
+and consequences of plagiarism and acknowledge that the assessor of this
+assignment may, for the purpose of assessing this assignment:
+ - Reproduce this assignment and provide a copy to another member of academic
+   staff; and/or
+ - Communicate a copy of this assignment to a plagiarism checking service
+   (which may then retain a copy of this assignment on its database for the
+   purpose of future plagiarism checking)
+
+----------------------
 Champlain College CSI-480, Fall 2017
 The following code was adapted by Joshua Auerbach (jauerbach@champlain.edu)
 from the UC Berkeley Pacman Projects (see license and attribution below).
