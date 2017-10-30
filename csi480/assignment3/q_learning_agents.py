@@ -61,7 +61,9 @@ class QLearningAgent(ReinforcementAgent):
           or the Q node value otherwise
         """
         "*** YOUR CODE HERE ***"
-        return self.q_values[(state, action)]
+        if (state, action) in self.q_values:
+            return self.q_values[(state, action)]
+        return 0.0
 
     def compute_value_from_q_values(self, state):
         """
@@ -115,7 +117,7 @@ class QLearningAgent(ReinforcementAgent):
         "*** YOUR CODE HERE ***"
         if legal_actions:
             if util.flip_coin(self.epsilon):
-                action = self.compute_action_from_q_values(state)
+                action = get_policy(state)
             else:
                 action = random.choice(legal_actions)
         return action
@@ -131,7 +133,7 @@ class QLearningAgent(ReinforcementAgent):
         """
         "*** YOUR CODE HERE ***"
         old_q_value = self.get_q_value(state, action)
-        estimated_next_value = self.compute_value_from_q_values(next_state)
+        estimated_next_value = self.get_value(next_state)
         sample = reward + (self.discount * estimated_next_value)
 
         new_q_value = ((1 - self.alpha) * old_q_value) + (self.alpha * sample)
