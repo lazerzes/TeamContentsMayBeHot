@@ -2,9 +2,10 @@ class Block:
     def __init__(self, starting_address, size, name="Empty"):
         self.starting_address = starting_address
         self.size = size
-        self.next = None
-        self.is_empty = True
         self.name = name
+        self.is_empty = True
+        self.next = None
+        self.id = None
 
     def load(self, name):
         self.name = name
@@ -19,7 +20,6 @@ class MemoryManager:
         self.used_memory = 0
         self.total_memory = total_memory
         self.root = Block(0, total_memory)
-        self.blocks = 1
 
     def allocate(self, name, memory_requirement):
         print("Allocating block of size", memory_requirement, "for", name)
@@ -56,6 +56,8 @@ class MemoryManager:
         new_block.next = block.next
         block.next = new_block
 
+        self.__recalculate_block_ids__()
+
     def free(self, name_to_free):
         print("Freeing block with name", name_to_free)
         block = self.root
@@ -87,11 +89,21 @@ class MemoryManager:
                 block.next = next_block.next
                 block.size += next_block.size
 
+        self.__recalculate_block_ids__()
+
     def top(self):
         print("Using:", self.used_memory, "out of", self.total_memory)
         block = self.root
         while block is not None:
-            print(block.starting_address, block.name, block.size)
+            print(block.id, block.starting_address, block.name, block.size)
+            block = block.next
+
+    def __recalculate_block_ids__(self):
+        current_id = 0
+        block = self.root
+        while block is not None:
+            block.id = current_id
+            current_id += 1
             block = block.next
 
 
