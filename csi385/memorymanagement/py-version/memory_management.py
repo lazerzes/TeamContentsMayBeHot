@@ -10,6 +10,10 @@ class Block:
         self.name = name
         self.is_empty = False
 
+    def unload(self):
+        self.name = "Empty"
+        self.is_empty = True
+
 class MemoryManager:
     def __init__(self, total_memory):
         self.used_memory = 0
@@ -18,15 +22,16 @@ class MemoryManager:
         self.blocks = 1
 
     def allocate(self, name, memory_requirement):
-        print("Attempting to allocate", memory_requirement, "memory units for", name)
+        print("Allocating block of size", memory_requirement, "for", name)
 
+        # Find first fit
         block = self.root
-        address = 0
+        current_address = 0
         while block is not None:
             if block.is_empty and block.size >= memory_requirement:
                 break
+            current_address += block.size
             block = block.next
-            address += 1
 
         # Case 1: Failed to find block
         if block is None:
@@ -34,10 +39,10 @@ class MemoryManager:
             return
 
         self.used_memory += memory_requirement
+        block.load(name)
 
         # Case 2: Block is a perfect fit
         if block.size is memory_requirement:
-            block.load(name)
             return
 
         # Case 3: Block is an imperfect fit
@@ -47,12 +52,40 @@ class MemoryManager:
         block.load(name)
 
         # Create and link new block
-        new_block = Block(address+1, new_block_size)
+        new_block = Block(current_address + memory_requirement, new_block_size)
         new_block.next = block.next
         block.next = new_block
 
-    def free(self, block_index):
-        pass
+    def free(self, name_to_free):
+        print("Freeing block with name", name_to_free)
+        block = self.root
+        previous_block = None
+        while block is not None:
+            if block.name is name_to_free:
+                break
+            previous_block = block
+            block = block.next
+
+        # Case 1: Failed to find block
+        if block is None:
+            print("Failed to free block. Block does not exist.")
+            return
+
+        self.used_memory -= block.size
+        block.unload()
+
+        # Case 2-A: Block has predecessor
+        if previous_block is not None:
+            if previous_block.is_empty:
+                previous_block.next = block.next
+                previous_block.size += block.size
+
+        # Case 2-B: Block has successor
+        next_block = block.next
+        if next_block is not None:
+            if next_block.is_empty:
+                block.next = next_block.next
+                block.size += next_block.size
 
     def top(self):
         print("Using:", self.used_memory, "out of", self.total_memory)
@@ -65,7 +98,13 @@ class MemoryManager:
 def main():
     memory = MemoryManager(64)
     memory.allocate("Init", 16)
-    memory.allocate("Calculator", 2)
+    memory.allocate("Foo", 2)
+    memory.allocate("Baz", 4)
+    memory.allocate("Yes", 1)
+    memory.allocate("Stuff", 12)
+    memory.top()
+    memory.free("Baz")
+    memory.free("Yes")
     memory.top()
 
 if __name__ == "__main__":
