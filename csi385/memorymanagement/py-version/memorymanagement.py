@@ -1,17 +1,37 @@
 class Block:
     def __init__(self, starting_address, size, name="Empty"):
         self.starting_address = starting_address
+        self.ending_address = starting_address + size
         self.size = size
         self.name = name
         self.is_empty = True
         self.next = None
         self.id = None
 
+    def display(self, simple=False):
+        """ Purpose: Display a summary of a memory block
+        Pre: None
+        Post: Memory block information printed to console
+        """
+        if simple:
+            print(self.id, self.name, self.size)
+        else:
+            print(self.id, self.name, self.starting_address, self.ending_address)
+
     def load(self, name):
+        """ Purpose: Load entity into a memory block
+        Pre: Name of entity
+        Post: Memory block initialized for new entity
+        """
         self.name = name
         self.is_empty = False
+        self.ending_address = self.starting_address + self.size
 
     def unload(self):
+        """ Purpose: Unload entity from memory block
+        Pre: None
+        Post: Memory block reset to empty
+        """
         self.name = "Empty"
         self.is_empty = True
 
@@ -22,6 +42,10 @@ class MemoryManager:
         self.root = Block(0, total_memory)
 
     def allocate(self, name, memory_requirement):
+        """ Purpose: Find a memory block for a new entity
+        Pre: Name of new entity and amount of space to allocate
+        Post: Memory block loaded with new entity if possible
+        """
         print("Allocating block of size", memory_requirement, "for", name)
 
         # Find first fit
@@ -59,6 +83,10 @@ class MemoryManager:
         self.__recalculate_block_ids__()
 
     def free(self, name_to_free):
+        """ Purpose: Find memory block with given name and free it
+        Pre: Name of target entity
+        Post: Memory block freed and merged with adjacent empty blocks
+        """
         print("Freeing block with name", name_to_free)
         block = self.root
         previous_block = None
@@ -92,32 +120,24 @@ class MemoryManager:
         self.__recalculate_block_ids__()
 
     def top(self):
+        """ Purpose: Display summary of memory allocation
+        Pre: None
+        Post: Summary printed to console
+        """
         print("Using:", self.used_memory, "out of", self.total_memory)
         block = self.root
         while block is not None:
-            print(block.id, block.starting_address, block.name, block.size)
+            block.display()
             block = block.next
 
     def __recalculate_block_ids__(self):
+        """ Purpose: Helper function that iteratively computes block IDs
+        Pre: None
+        Post: Block IDs updated
+        """
         current_id = 0
         block = self.root
         while block is not None:
             block.id = current_id
             current_id += 1
             block = block.next
-
-
-def main():
-    memory = MemoryManager(64)
-    memory.allocate("Init", 16)
-    memory.allocate("Foo", 2)
-    memory.allocate("Baz", 4)
-    memory.allocate("Yes", 1)
-    memory.allocate("Stuff", 12)
-    memory.top()
-    memory.free("Baz")
-    memory.free("Yes")
-    memory.top()
-
-if __name__ == "__main__":
-    main()
