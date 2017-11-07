@@ -1,8 +1,3 @@
-#include "header.hpp"
-
-
-using namespace std;
-
 struct Node {
 
 	Node* previous;
