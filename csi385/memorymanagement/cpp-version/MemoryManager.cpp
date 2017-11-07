@@ -2,15 +2,46 @@
 
 MemoryManager::MemoryManager()
 {
+    mHead = new Node(0, 500, "free memory", true);
+}
+
+Node* MemoryManager::findEmptySpaceForProcess(uint size)
+{
+
+    if(mHead != NULL){
+        if(mHead->mIsEmpty){
+            return mHead;
+        }
+
+        temp = mHead->next;
+        while(temp != NULL){
+            temp->mIsEmpty && size <= temp->size ? return temp : temp = temp->mNext;
+        }
+
+        return NULL;
+    }
 
 }
 
-vector<*Node> MemoryManager::findEmptySpaceForProcess()
+void MemoryManager::allocate(string name, uint size)
 {
+    Node* freespace = findEmptySpaceForProcess(size);
 
-}
+    if(freespace == NULL){
+        //out error not enought space
+        return;
+    }
 
-void MemoryManager::allocate(char name, uint size)
-{
-    
+    Node* newNode = new Node(freespace->start, size, name, false);
+
+    if(size < freespace->size){
+        freespace->size -= (size);
+        freespace->start = (size - 1);
+
+        if(frees)
+
+    }
+
+
+
 }

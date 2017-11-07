@@ -15,7 +15,9 @@ struct Node
     Node *mNext;
 
     uint mStart;
-    uint mEnd;
+    uint mSize;
+
+    bool mIsEmpty;
 
     string name;
 }
@@ -23,12 +25,13 @@ struct Node
 class MemoryManager
 {
     public:
-    uint mSize;
+
     Node *mHead;
 
     MemoryManager();
-    vector<Node*>findEmptySpaceForProcess();
-    void allocate(char name, uint size);
+    Node* findEmptySpaceForProcess(uint size);
+    void allocate(string name, uint size);
+    void free(string name);
 };
 
 #endif
