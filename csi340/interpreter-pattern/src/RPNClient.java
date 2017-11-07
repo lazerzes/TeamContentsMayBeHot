@@ -10,12 +10,14 @@ public class RPNClient
         Stack<AbstractExpression> stack = new Stack<AbstractExpression>();
         String[] symbols = expression.split(" ");
 
-        System.out.println(expression);
+        System.out.println("Interpreting expression: " + expression);
 
         for (String sym : symbols)
         {
+            System.out.println("Interpreting symbol: " + sym);
             if (this.isOperator(sym))
             {
+                System.out.println("Symbol identified as operator");
                 AbstractExpression rhs = stack.pop();
                 AbstractExpression lhs = stack.pop();
                 AbstractExpression operator = new OperatorExpression(sym, lhs, rhs);
@@ -24,18 +26,19 @@ public class RPNClient
             }
             else if (this.isOperand(sym))
             {
+                System.out.println("Symbol identified as operand");
                 AbstractExpression operand = new OperandExpression(sym);
                 stack.push(operand);
             }
         }
-        System.out.println(stack.pop().interpret());
+        System.out.println("Result: " + stack.pop().interpret());
     }
 
     private boolean isOperator(String sym)
     {
         boolean result = true;
 
-        if (sym.length() != 1 || !OPERATORS.contains(sym.charAt(0)))
+        if (sym.length() != 2 || !OPERATORS.contains(sym.charAt(0)))
         {
             result = false;
         }
