@@ -23,6 +23,7 @@ public class RPNClient
                 AbstractExpression operator = new OperatorExpression(sym, lhs, rhs);
                 Double result = operator.interpret();
                 AbstractExpression operand = new OperandExpression(result);
+                stack.push(operand);
             }
             else if (this.isOperand(sym))
             {
@@ -38,8 +39,9 @@ public class RPNClient
     {
         boolean result = true;
 
-        if (sym.length() != 2 || !OPERATORS.contains(sym.charAt(0)))
+        if (sym.length() != 1 || !OPERATORS.contains(sym))
         {
+            System.out.println("returning false on " + sym);
             result = false;
         }
 
