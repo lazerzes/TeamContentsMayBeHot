@@ -1,7 +1,5 @@
 // Concrete terminal expression (external node)
 
-package rpn;
-
 public class OperandExpression extends AbstractExpression
 {
     private double operand;

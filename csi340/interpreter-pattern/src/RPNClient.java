@@ -1,30 +1,25 @@
-package rpn;
-
 import java.util.Stack;
+import java.util.*;
 
 public class RPNClient
 {
-    private char[] NUMBERS = {'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'};
-    private char[] OPERATORS = {'+', '-', '*', '/'};
-
-    public void addExpression(AbstractExpression expression)
-    {
-        this.mExpressions.add(expression);
-    }
+    private ArrayList<String> OPERATORS = new ArrayList<String>(Arrays.asList("+", "-", "*", "/"));
 
     public void interpret(String expression)
     {
-        Stack stack = new Stack();
-        String[] symbols = expression.split(' ');
+        Stack<AbstractExpression> stack = new Stack<AbstractExpression>();
+        String[] symbols = expression.split(" ");
+
+        System.out.println(expression);
 
         for (String sym : symbols)
         {
             if (this.isOperator(sym))
             {
-                AbstractExpression operator = new OperatorExpression(sym);
                 AbstractExpression rhs = stack.pop();
                 AbstractExpression lhs = stack.pop();
-                Double result = operator.interpret(lhs, rhs);
+                AbstractExpression operator = new OperatorExpression(sym, lhs, rhs);
+                Double result = operator.interpret();
                 AbstractExpression operand = new OperandExpression(result);
             }
             else if (this.isOperand(sym))
@@ -33,18 +28,14 @@ public class RPNClient
                 stack.push(operand);
             }
         }
-
-        for (AbstractExpression expression : this.mExpressions)
-        {
-            expression.interpret(this.context);
-        }
+        System.out.println(stack.pop().interpret());
     }
 
     private boolean isOperator(String sym)
     {
-        result = true;
+        boolean result = true;
 
-        if (sym.length != 1 || !OPERATORS.contains(sym[0]))
+        if (sym.length() != 1 || !OPERATORS.contains(sym.charAt(0)))
         {
             result = false;
         }
@@ -54,15 +45,15 @@ public class RPNClient
 
     private boolean isOperand(String sym)
     {
-        result = true;
+        boolean result = true;
 
-        for (int i = 0; i < sym.length(); i++)
+        try
         {
-            if (!NUMBERS.contains(sym[i]))
-            {
-                result = false;
-                break;
-            }
+            Double.parseDouble(sym);
+        }
+        catch (NumberFormatException exception)
+        {
+            result = false;
         }
 
         return result;

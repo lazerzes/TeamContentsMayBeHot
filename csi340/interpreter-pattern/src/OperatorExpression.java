@@ -1,14 +1,16 @@
 // Concrete nonterminal expression (internal node)
 
-package rpn;
-
 public class OperatorExpression extends AbstractExpression
 {
     private char operator;
+    private AbstractExpression lhs;
+    private AbstractExpression rhs;
 
-    public OperatorExpression(String sym)
+    public OperatorExpression(String sym, AbstractExpression lhs, AbstractExpression rhs)
     {
         this.operator = sym.charAt(0);
+        this.lhs = lhs;
+        this.rhs = rhs;
     }
 
     public double interpret()
@@ -17,16 +19,16 @@ public class OperatorExpression extends AbstractExpression
         switch (operator)
         {
             case '+':
-                result = lhs.interpret() + rhs.interpret();
+                result = this.lhs.interpret() + this.rhs.interpret();
                 break;
             case '-':
-                result = lhs.interpret() - rhs.interpret();
+                result = this.lhs.interpret() - this.rhs.interpret();
                 break;
             case '*':
-                result = lhs.interpret() * rhs.interpret();
+                result = this.lhs.interpret() * this.rhs.interpret();
                 break;
             case '/':
-                result = lhs.interpret() / rhs.interpret();
+                result = this.lhs.interpret() / this.rhs.interpret();
                 break;
         }
         return result;
