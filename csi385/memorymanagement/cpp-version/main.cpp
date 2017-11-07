@@ -1,12 +1,5 @@
-#include <iostream>
-#include <vector>
-
-#define uint unsigned int
-
-using namespace std;
-
 struct Node {
-	
+
 	Node* previous;
 	Node* next;
 
@@ -29,7 +22,7 @@ class MemoryManager {
 public:
 	uint size;
 	Node* head;
-	
+
 	MemoryManager(uint size) {
 		this->size = size;
 		head = new Node(0, this->size, "unused");
