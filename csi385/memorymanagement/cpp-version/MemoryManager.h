@@ -28,7 +28,7 @@ class MemoryManager
 
     Node *mHead;
 
-    MemoryManager();
+    MemoryManager(uint capacity);
     Node* findEmptySpaceForProcess(uint size);
     void allocate(string name, uint size);
     void free(string name);

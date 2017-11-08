@@ -1,8 +1,8 @@
 #include "MemoryManager.h"
 
-MemoryManager::MemoryManager()
+MemoryManager::MemoryManager(uint capacity)
 {
-    mHead = new Node(0, 500, "free memory", true);
+    mHead = new Node(0, capacity, "free memory", true);
 }
 
 Node* MemoryManager::findEmptySpaceForProcess(uint size)
