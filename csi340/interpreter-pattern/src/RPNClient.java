@@ -5,19 +5,21 @@ public class RPNClient
 {
     private ArrayList<String> OPERATORS = new ArrayList<String>(Arrays.asList("+", "-", "*", "/"));
 
+    public boolean verbose = false;
+
     public void interpret(String expression)
     {
         Stack<AbstractExpression> stack = new Stack<AbstractExpression>();
         String[] symbols = expression.split(" ");
 
-        System.out.println("Interpreting expression: " + expression);
+        if (this.verbose) { System.out.println("Interpreting expression: " + expression); }
 
         for (String sym : symbols)
         {
-            System.out.println("Interpreting symbol: " + sym);
+            if (this.verbose) { System.out.println("Interpreting symbol: " + sym); }
             if (this.isOperator(sym))
             {
-                System.out.println("Symbol identified as operator");
+                if (this.verbose) { System.out.println("Symbol identified as operator"); }
                 AbstractExpression rhs = stack.pop();
                 AbstractExpression lhs = stack.pop();
                 AbstractExpression operator = new OperatorExpression(sym, lhs, rhs);
@@ -27,12 +29,19 @@ public class RPNClient
             }
             else if (this.isOperand(sym))
             {
-                System.out.println("Symbol identified as operand");
+                if (this.verbose) { System.out.println("Symbol identified as operand"); }
                 AbstractExpression operand = new OperandExpression(sym);
                 stack.push(operand);
             }
         }
-        System.out.println("Result: " + stack.pop().interpret());
+
+        double result = stack.pop().interpret();
+
+        if (this.verbose) { System.out.println("Result: " + result); }
+        else
+        {
+            System.out.println(expression + " = " + result);
+        }
     }
 
     private boolean isOperator(String sym)
@@ -41,7 +50,6 @@ public class RPNClient
 
         if (sym.length() != 1 || !OPERATORS.contains(sym))
         {
-            System.out.println("returning false on " + sym);
             result = false;
         }
 
