@@ -7,15 +7,16 @@ MemoryManager::MemoryManager(uint capacity)
 
 Node* MemoryManager::findEmptySpaceForProcess(uint size)
 {
+    Node *temp;
 
     if(mHead != NULL){
         if(mHead->mIsEmpty){
             return mHead;
         }
 
-        temp = mHead->next;
+        temp = mHead->mNext;
         while(temp != NULL){
-            temp->mIsEmpty && size <= temp->size ? return temp : temp = temp->mNext;
+            temp->mIsEmpty && size <= temp->mSize ? return temp : temp = temp->mNext;
         }
 
         return NULL;
@@ -32,11 +33,11 @@ void MemoryManager::allocate(string name, uint size)
         return;
     }
 
-    Node* newNode = new Node(freespace->start, size, name, false);
+    Node* newNode = new Node(freespace->mStart, size, name, false);
 
-    if(size < freespace->size){
-        freespace->size -= (size);
-        freespace->start = (size - 1);
+    if(size < freespace->mSize){
+        freespace->mSize -= (size);
+        freespace->mStart = (size - 1);
 
         if(frees)
 

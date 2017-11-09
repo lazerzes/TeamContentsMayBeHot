@@ -17,10 +17,18 @@ struct Node
     uint mStart;
     uint mSize;
 
+    string mName;
+
     bool mIsEmpty;
 
-    string name;
-}
+    Node(uint start, uint size, string name, bool isEmpty)
+    {
+        mStart = start;
+        mSize = size;
+        mName = name;
+        mIsEmpty = isEmpty;
+    }
+};
 
 class MemoryManager
 {
