@@ -11,19 +11,19 @@ using namespace std;
 
 struct Node
 {
-    Node *mPrevious;
-    Node *mNext;
+	Node *mPrevious;
+	Node *mNext;
 
-    uint mStart;
-    uint mSize;
+	uint mStart;
+	uint mSize;
 
-    bool mIsEmpty;
+	string mName;
 
-    string mName;
+	bool mIsEmpty;
+
 
 	Node(uint start, uint size, string name, bool isEmpty);
-
-}
+};
 
 class MemoryManager
 {
@@ -31,7 +31,7 @@ class MemoryManager
 
     Node *mHead;
 
-    MemoryManager();
+    MemoryManager(uint capacity);
     Node* findEmptySpaceForProcess(uint size);
     void allocate(string name, uint size);
     void free(string name);
