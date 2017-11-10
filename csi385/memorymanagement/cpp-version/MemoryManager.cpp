@@ -1,5 +1,14 @@
 #include "MemoryManager.h"
 
+Node::Node(uint start, uint size, string name, bool isEmpty) {
+
+	mStart = start;
+	mSize = size;
+	mName = name;
+	mIsEmpty = isEmpty;
+
+}
+
 MemoryManager::MemoryManager()
 {
     mHead = new Node(0, 500, "free memory", true);
@@ -12,10 +21,15 @@ Node* MemoryManager::findEmptySpaceForProcess(uint size)
         if(mHead->mIsEmpty){
             return mHead;
         }
-
-        temp = mHead->next;
+		
+        Node* temp = mHead->mNext;
         while(temp != NULL){
-            temp->mIsEmpty && size <= temp->size ? return temp : temp = temp->mNext;
+			if (temp->mIsEmpty && size <= temp->mSize) {
+				return temp;
+			}
+			else {
+				temp = temp->mNext;
+			}
         }
 
         return NULL;
@@ -32,15 +46,7 @@ void MemoryManager::allocate(string name, uint size)
         return;
     }
 
-    Node* newNode = new Node(freespace->start, size, name, false);
-
-    if(size < freespace->size){
-        freespace->size -= (size);
-        freespace->start = (size - 1);
-
-        if(frees)
-
-    }
+    Node* newNode = new Node(freespace->mStart, size, name, false);
 
 
 

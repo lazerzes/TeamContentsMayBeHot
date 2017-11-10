@@ -19,7 +19,10 @@ struct Node
 
     bool mIsEmpty;
 
-    string name;
+    string mName;
+
+	Node(uint start, uint size, string name, bool isEmpty);
+
 }
 
 class MemoryManager
