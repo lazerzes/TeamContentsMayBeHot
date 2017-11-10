@@ -55,6 +55,34 @@ void MemoryManager::allocate(string name, uint size)
 
     Node* newNode = new Node(freespace->mStart, size, name, false);
 
+	if (freespace->mSize - size == 0)
+	{
+		newNode->mNext = freespace->mNext;
+		newNode->mPrevious = freespace->mPrevious;
+		
+		if (newNode->mPrevious != NULL) {
+			newNode->mPrevious->mNext = newNode;
+		}
 
+		delete freespace;
+
+	}
+	else
+	{
+		newNode->mNext = freespace;
+		newNode->mPrevious = freespace->mPrevious;
+
+		freespace->mStart = (newNode->mStart + (newNode->mSize - 1));
+		freespace->mSize -= newNode->mSize;
+
+		if (newNode->mPrevious != NULL) {
+			newNode->mPrevious->mNext = newNode;
+		}
+
+	}
+
+	if (newNode->mStart == 0) {
+		mHead = newNode;
+	}
 
 }
