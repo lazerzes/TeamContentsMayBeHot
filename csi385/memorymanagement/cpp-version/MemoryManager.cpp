@@ -143,7 +143,7 @@ void MemoryManager::display()
  ******************************************************************************/
 void MemoryManager::free(string name)
 {
-    cout << "Freeing block with name" << name << endl;
+    cout << "Freeing block with name " << name << endl;
     Node *temp = findNodeByName(name);
 
     // Case 1: Failed to find node
