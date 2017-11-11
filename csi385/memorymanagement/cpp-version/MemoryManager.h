@@ -13,16 +13,16 @@ const string EMPTY = "empty block";
 
 struct Node
 {
-	Node *mPrevious;
-	Node *mNext;
+    Node *mPrevious;
+    Node *mNext;
 
-	uint mStart;
-	uint mSize;
+    uint mStart;
+    uint mSize;
 
-	string mName;
-	bool mIsEmpty;
+    string mName;
+    bool mIsEmpty;
 
-	Node(uint start, uint size, string name, bool isEmpty);
+    Node(uint start, uint size, string name, bool isEmpty);
 };
 
 class MemoryManager

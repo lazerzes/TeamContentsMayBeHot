@@ -6,11 +6,11 @@ Node::Node(uint start, uint size, string name, bool isEmpty)
     mPrevious = NULL;
     mNext = NULL;
 
-	mStart = start;
-	mSize = size;
+    mStart = start;
+    mSize = size;
 
-	mName = name;
-	mIsEmpty = isEmpty;
+    mName = name;
+    mIsEmpty = isEmpty;
 
 }
 
@@ -21,24 +21,24 @@ MemoryManager::MemoryManager(uint capacity)
 
 Node* MemoryManager::findEmptySpaceForProcess(uint size)
 {
-	if (mHead != NULL)
-	{
-		if (mHead->mIsEmpty && mHead->mSize >= size)
-		{
-			return mHead;
-		}
+    if (mHead != NULL)
+    {
+        if (mHead->mIsEmpty && mHead->mSize >= size)
+        {
+            return mHead;
+        }
 
-		Node* temp = mHead->mNext;
-		while (temp != NULL)
-		{
-			if (temp->mIsEmpty && temp->mSize >= size)
-			{
-				return temp;
-			}
-			temp = temp->mNext;
-		}
-	}
-	return NULL;
+        Node* temp = mHead->mNext;
+        while (temp != NULL)
+        {
+            if (temp->mIsEmpty && temp->mSize >= size)
+            {
+                return temp;
+            }
+            temp = temp->mNext;
+        }
+    }
+    return NULL;
 }
 
 void MemoryManager::allocate(string name, uint size)
@@ -48,7 +48,7 @@ void MemoryManager::allocate(string name, uint size)
 
     // Case 1: Failed to find free space
     if (freespace == NULL)
-	{
+    {
         cout << "Memory allocation failure. Insufficient memory." << endl;
         return;
     }
@@ -57,19 +57,19 @@ void MemoryManager::allocate(string name, uint size)
     freespace->mIsEmpty = false;
 
     // Case 2: Free space is an exact fit, meaning we are done
-	if (freespace->mSize == size)
-	{
-		return;
-	}
+    if (freespace->mSize == size)
+    {
+        return;
+    }
     // Case 3: Free space is larger than necessary
-	else
-	{
+    else
+    {
         Node* newNode = new Node(freespace->mStart + size, freespace->mSize - size, EMPTY, true);
         freespace->mSize = size;
-		newNode->mNext = freespace->mNext;
+        newNode->mNext = freespace->mNext;
         newNode->mPrevious = freespace;
         freespace->mNext = newNode;
-	}
+    }
 }
 
 void MemoryManager::display()
