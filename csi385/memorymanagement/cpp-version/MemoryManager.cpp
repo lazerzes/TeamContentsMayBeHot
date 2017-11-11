@@ -1,3 +1,24 @@
+/*       Authors: Rei Armenia, Matthew James Harrison
+ *         Class: CSI-385 Operating Systems Architecture
+ *    Assignment: Memory Allocation and Deallocation using LinkedLists
+ *      Due Date: November 11, 2017
+ *
+ * Description:
+ *   This C++ program models memory allocation.
+ *
+ * Certication of Authenticity:
+ *   I certify that this is entirely my own work, except where I have given
+ *   fully-documented references to the work of others. I understand the
+ *   definition and consequences of plagiarism and acknowledge that the
+ *   assessor of this assignment may, for the purpose of assessing this
+ *   assignment:
+ *     -  Reproduce this assignment and provide a copy to another member of
+ *        academic staff; and/or
+ *     -  Communicate a copy of this assignment to a plagiarism checking service
+ *        (which may then retain a copy of this assignment on its database for
+ *        the purpose of future plagiarism checking)
+ ******************************************************************************/
+
 #include "MemoryManager.h"
 
 Node::Node(uint start, uint size, string name, bool isEmpty)
@@ -20,6 +41,10 @@ MemoryManager::MemoryManager(uint capacity)
     mTotal = capacity;
 }
 
+/* Purpose:
+ * Pre:
+ * Post:
+ ******************************************************************************/
 Node *MemoryManager::findEmptySpaceForProcess(uint size)
 {
     if (mHead != NULL)
@@ -42,6 +67,10 @@ Node *MemoryManager::findEmptySpaceForProcess(uint size)
     return NULL;
 }
 
+/* Purpose: Helper function for searching the linked list for a particular node
+ * Pre: Name of target node
+ * Post: Returns pointer to matching node, or NULL if no match is found
+ ******************************************************************************/
 Node *MemoryManager::findNodeByName(string name)
 {
     Node *temp = mHead;
@@ -56,6 +85,10 @@ Node *MemoryManager::findNodeByName(string name)
     return temp;
 }
 
+/* Purpose:
+ * Pre:
+ * Post:
+ ******************************************************************************/
 void MemoryManager::allocate(string name, uint size)
 {
     cout << "Allocating block of size " << size << " for " << name << endl;
@@ -88,6 +121,10 @@ void MemoryManager::allocate(string name, uint size)
     }
 }
 
+/* Purpose: Display info about memory usage
+ * Pre: None
+ * Post: Info about each block of memory printed to the console
+ ******************************************************************************/
 void MemoryManager::display()
 {
     cout << "Available: " << mAvailable << "/" << mTotal << endl;
@@ -100,11 +137,16 @@ void MemoryManager::display()
     }
 }
 
+/* Purpose:
+ * Pre:
+ * Post:
+ ******************************************************************************/
 void MemoryManager::free(string name)
 {
     cout << "Freeing block with name" << name << endl;
     Node *temp = findNodeByName(name);
 
+    // Case 1: Failed to find node
     if (temp == NULL)
     {
         cout << "Failed to free block. Block does not exist." << endl;
@@ -115,13 +157,15 @@ void MemoryManager::free(string name)
     temp->mName = EMPTY;
     temp->mIsEmpty = true;
 
+    // Case 2-A: Merge with previous
     if (temp->mPrevious != NULL)
     {
 
     }
 
+    // Case 2-B: Merge with next
     if (temp->mNext != NULL)
     {
-        
+
     }
 }
