@@ -1,6 +1,5 @@
 #include "MemoryManager.h"
 
-
 Node::Node(uint start, uint size, string name, bool isEmpty)
 {
     mPrevious = NULL;
@@ -17,6 +16,8 @@ Node::Node(uint start, uint size, string name, bool isEmpty)
 MemoryManager::MemoryManager(uint capacity)
 {
     mHead = new Node(0, capacity, EMPTY, true);
+    mAvailable = capacity;
+    mTotal = capacity;
 }
 
 Node *MemoryManager::findEmptySpaceForProcess(uint size)
@@ -41,7 +42,7 @@ Node *MemoryManager::findEmptySpaceForProcess(uint size)
     return NULL;
 }
 
-Node *findNodeByName(string name)
+Node *MemoryManager::findNodeByName(string name)
 {
     Node *temp = mHead;
     while (temp != NULL)
@@ -69,6 +70,7 @@ void MemoryManager::allocate(string name, uint size)
 
     freespace->mName = name;
     freespace->mIsEmpty = false;
+    mAvailable -= size;
 
     // Case 2: Free space is an exact fit, meaning we are done
     if (freespace->mSize == size)
@@ -88,8 +90,9 @@ void MemoryManager::allocate(string name, uint size)
 
 void MemoryManager::display()
 {
-    Node *current = mHead;
+    cout << "Available: " << mAvailable << "/" << mTotal << endl;
 
+    Node *current = mHead;
     while (current != NULL)
     {
         cout << current->mName << ": " << current->mStart << " (" << current->mSize << ")"<< endl;

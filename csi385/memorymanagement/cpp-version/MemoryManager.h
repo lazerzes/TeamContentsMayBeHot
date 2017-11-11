@@ -27,10 +27,12 @@ struct Node
 
 class MemoryManager
 {
-    public:
-
+    private:
     Node *mHead;
+    uint mAvailable;
+    uint mTotal;
 
+    public:
     MemoryManager(uint capacity);
     Node *findEmptySpaceForProcess(uint size);
     Node *findNodeByName(string name);
