@@ -1,10 +1,14 @@
 #include "MemoryManager.h"
 
 
-Node::Node(uint start, uint size, string name, bool isEmpty) {
+Node::Node(uint start, uint size, string name, bool isEmpty)
+{
+    mPrevious = NULL;
+    mNext = NULL;
 
 	mStart = start;
 	mSize = size;
+
 	mName = name;
 	mIsEmpty = isEmpty;
 
@@ -19,7 +23,6 @@ Node* MemoryManager::findEmptySpaceForProcess(uint size)
 {
 	if (mHead != NULL)
 	{
-
 		if (mHead->mIsEmpty && mHead->mSize >= size)
 		{
 			return mHead;
@@ -32,59 +35,41 @@ Node* MemoryManager::findEmptySpaceForProcess(uint size)
 			{
 				return temp;
 			}
-
 			temp = temp->mNext;
-
 		}
-
 	}
-
 	return NULL;
-
 }
 
 void MemoryManager::allocate(string name, uint size)
 {
+    cout << "Allocating block of size " << size << " for " << name << endl;
     Node* freespace = findEmptySpaceForProcess(size);
 
-    if(freespace == NULL)
+    // Case 1: Failed to find free space
+    if (freespace == NULL)
 	{
-        //out error not enought space
+        cout << "Memory allocation failure. Insufficient memory." << endl;
         return;
     }
 
-    Node* newNode = new Node(freespace->mStart, size, name, false);
+    freespace->mName = name;
+    freespace->mIsEmpty = false;
 
-	if (freespace->mSize - size == 0)
+    // Case 2: Free space is an exact fit, meaning we are done
+	if (freespace->mSize == size)
 	{
-		newNode->mNext = freespace->mNext;
-		newNode->mPrevious = freespace->mPrevious;
-
-		if (newNode->mPrevious != NULL) {
-			newNode->mPrevious->mNext = newNode;
-		}
-
-		delete freespace;
-
+		return;
 	}
+    // Case 3: Free space is larger than necessary
 	else
 	{
-		newNode->mNext = freespace;
-		newNode->mPrevious = freespace->mPrevious;
-
-		freespace->mStart = (newNode->mStart + (newNode->mSize - 1));
-		freespace->mSize -= newNode->mSize;
-
-		if (newNode->mPrevious != NULL) {
-			newNode->mPrevious->mNext = newNode;
-		}
-
+        Node* newNode = new Node(freespace->mStart + size, freespace->mSize - size, EMPTY, true);
+        freespace->mSize = size;
+		newNode->mNext = freespace->mNext;
+        newNode->mPrevious = freespace;
+        freespace->mNext = newNode;
 	}
-
-	if (newNode->mStart == 0) {
-		mHead = newNode;
-	}
-
 }
 
 void MemoryManager::display()

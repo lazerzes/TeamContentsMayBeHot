@@ -20,9 +20,7 @@ struct Node
 	uint mSize;
 
 	string mName;
-
 	bool mIsEmpty;
-
 
 	Node(uint start, uint size, string name, bool isEmpty);
 };
