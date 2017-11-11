@@ -19,7 +19,7 @@ MemoryManager::MemoryManager(uint capacity)
     mHead = new Node(0, capacity, EMPTY, true);
 }
 
-Node* MemoryManager::findEmptySpaceForProcess(uint size)
+Node *MemoryManager::findEmptySpaceForProcess(uint size)
 {
     if (mHead != NULL)
     {
@@ -39,6 +39,20 @@ Node* MemoryManager::findEmptySpaceForProcess(uint size)
         }
     }
     return NULL;
+}
+
+Node *findNodeByName(string name)
+{
+    Node *temp = mHead;
+    while (temp != NULL)
+    {
+        if (temp->mName == name)
+        {
+            break;
+        }
+        temp = temp->mNext;
+    }
+    return temp;
 }
 
 void MemoryManager::allocate(string name, uint size)
@@ -81,4 +95,9 @@ void MemoryManager::display()
         cout << current->mName << ": " << current->mStart << " (" << current->mSize << ")"<< endl;
         current = current->mNext;
     }
+}
+
+void MemoryManager::free(string name)
+{
+    cout << "Freeing block with name" << name << endl;
 }
