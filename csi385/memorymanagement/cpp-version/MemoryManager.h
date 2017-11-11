@@ -5,9 +5,11 @@
 #include <string>
 #include <vector>
 
-#define uint unsigned int
+#define uint size_t
 
 using namespace std;
+
+const string EMPTY = "empty block";
 
 struct Node
 {
@@ -34,6 +36,7 @@ class MemoryManager
     MemoryManager(uint capacity);
     Node* findEmptySpaceForProcess(uint size);
     void allocate(string name, uint size);
+    void display();
     void free(string name);
 };
 

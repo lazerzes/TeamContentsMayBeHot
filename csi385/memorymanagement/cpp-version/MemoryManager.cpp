@@ -12,7 +12,7 @@ Node::Node(uint start, uint size, string name, bool isEmpty) {
 
 MemoryManager::MemoryManager(uint capacity)
 {
-    mHead = new Node(0, capacity, "free memory", true);
+    mHead = new Node(0, capacity, EMPTY, true);
 }
 
 Node* MemoryManager::findEmptySpaceForProcess(uint size)
@@ -20,15 +20,15 @@ Node* MemoryManager::findEmptySpaceForProcess(uint size)
 	if (mHead != NULL)
 	{
 
-		if (mHead->mIsEmpty && mHead->mSize >= size) 
+		if (mHead->mIsEmpty && mHead->mSize >= size)
 		{
 			return mHead;
 		}
 
 		Node* temp = mHead->mNext;
-		while (temp != NULL) 
+		while (temp != NULL)
 		{
-			if (temp->mIsEmpty && temp->mSize >= size) 
+			if (temp->mIsEmpty && temp->mSize >= size)
 			{
 				return temp;
 			}
@@ -59,7 +59,7 @@ void MemoryManager::allocate(string name, uint size)
 	{
 		newNode->mNext = freespace->mNext;
 		newNode->mPrevious = freespace->mPrevious;
-		
+
 		if (newNode->mPrevious != NULL) {
 			newNode->mPrevious->mNext = newNode;
 		}
@@ -85,4 +85,15 @@ void MemoryManager::allocate(string name, uint size)
 		mHead = newNode;
 	}
 
+}
+
+void MemoryManager::display()
+{
+    Node *current = mHead;
+
+    while (current != NULL)
+    {
+        cout << current->mName << ": " << current->mStart << " (" << current->mSize << ")"<< endl;
+        current = current->mNext;
+    }
 }
