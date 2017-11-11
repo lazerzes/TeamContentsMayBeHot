@@ -59,7 +59,7 @@ Node *MemoryManager::findNodeByName(string name)
 void MemoryManager::allocate(string name, uint size)
 {
     cout << "Allocating block of size " << size << " for " << name << endl;
-    Node* freespace = findEmptySpaceForProcess(size);
+    Node *freespace = findEmptySpaceForProcess(size);
 
     // Case 1: Failed to find free space
     if (freespace == NULL)
@@ -103,4 +103,25 @@ void MemoryManager::display()
 void MemoryManager::free(string name)
 {
     cout << "Freeing block with name" << name << endl;
+    Node *temp = findNodeByName(name);
+
+    if (temp == NULL)
+    {
+        cout << "Failed to free block. Block does not exist." << endl;
+        return;
+    }
+
+    mAvailable += temp->mSize;
+    temp->mName = EMPTY;
+    temp->mIsEmpty = true;
+
+    if (temp->mPrevious != NULL)
+    {
+
+    }
+
+    if (temp->mNext != NULL)
+    {
+        
+    }
 }
