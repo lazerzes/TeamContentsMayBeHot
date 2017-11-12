@@ -109,6 +109,7 @@ class MemoryManager:
             if previous_block.is_empty:
                 previous_block.next = block.next
                 previous_block.size += block.size
+                block = previous_block
 
         # Case 2-B: Block has successor
         next_block = block.next
