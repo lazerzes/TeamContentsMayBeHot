@@ -12,11 +12,6 @@ public class InterpreterClient
         this.mContext = context;
     }
 
-    public void addExpression(AbstractExpression expression)
-    {
-        this.mExpressions.add(expression);
-    }
-
     public void interpret(String symbols)
     {
         this.mExpressions = this.mContext.parse(symbols);
