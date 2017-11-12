@@ -51,9 +51,9 @@ MemoryManager::~MemoryManager()
     mHead = NULL;
 }
 
-/* Purpose:
- * Pre:
- * Post:
+/* Purpose: Find the first block that has the specified size
+ * Pre: Size
+ * Post: Returns pointer to suitable block, or NULL
  ******************************************************************************/
 Node *MemoryManager::findFirstFit(uint size)
 {
@@ -95,9 +95,9 @@ Node *MemoryManager::findNodeByName(string name)
     return NULL;
 }
 
-/* Purpose:
- * Pre:
- * Post:
+/* Purpose: Allocate memory block for node with specified name and size
+ * Pre: Name and size requirement
+ * Post: Block allocated if possible
  ******************************************************************************/
 void MemoryManager::allocate(string name, uint size)
 {
@@ -149,9 +149,9 @@ void MemoryManager::display()
     temp = NULL;
 }
 
-/* Purpose:
- * Pre:
- * Post:
+/* Purpose: Free memory block with specified name
+ * Pre: Name of memory block
+ * Post: Memory block freed and merged with adjacent free space if possible
  ******************************************************************************/
 void MemoryManager::free(string name)
 {
