@@ -44,7 +44,7 @@ struct Node
     bool mIsEmpty;
 
     Node(uint start, uint size, string name, bool isEmpty);
-    ~Node():
+    ~Node();
 };
 
 class MemoryManager
@@ -57,7 +57,7 @@ class MemoryManager
     public:
     MemoryManager(uint capacity);
     ~MemoryManager();
-    Node *findEmptySpaceForProcess(uint size);
+    Node *findFirstFit(uint size);
     Node *findNodeByName(string name);
     void allocate(string name, uint size);
     void display();

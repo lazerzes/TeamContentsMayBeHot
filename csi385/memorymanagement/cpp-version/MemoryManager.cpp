@@ -55,7 +55,7 @@ MemoryManager::~MemoryManager()
  * Pre:
  * Post:
  ******************************************************************************/
-Node *MemoryManager::findEmptySpaceForProcess(uint size)
+Node *MemoryManager::findFirstFit(uint size)
 {
     if (mHead != NULL)
     {
@@ -102,7 +102,7 @@ Node *MemoryManager::findNodeByName(string name)
 void MemoryManager::allocate(string name, uint size)
 {
     cout << "Allocating block of size " << size << " for " << name << endl;
-    Node *freespace = findEmptySpaceForProcess(size);
+    Node *freespace = findFirstFit(size);
 
     // Case 1: Failed to find free space
     if (freespace == NULL)
