@@ -115,7 +115,7 @@ void MemoryManager::allocate(string name, uint size)
     freespace->mIsEmpty = false;
     mAvailable -= size;
 
-    // Case 2: Free space is an exact fit, meaning we are done
+    // Case 2: Free space is an exact fit
     if (freespace->mSize == size)
     {
         return;
@@ -129,6 +129,7 @@ void MemoryManager::allocate(string name, uint size)
         newNode->mPrevious = freespace;
         freespace->mNext = newNode;
     }
+    freespace = NULL;
 }
 
 /* Purpose: Display info about memory usage
@@ -139,12 +140,13 @@ void MemoryManager::display()
 {
     cout << "Available: " << mAvailable << "/" << mTotal << endl;
 
-    Node *current = mHead;
-    while (current != NULL)
+    Node *temp = mHead;
+    while (temp != NULL)
     {
-        cout << current->mName << ": " << current->mStart << " (" << current->mSize << ")"<< endl;
-        current = current->mNext;
+        cout << temp->mName << ": " << temp->mStart << " (" << temp->mSize << ")"<< endl;
+        temp = temp->mNext;
     }
+    temp = NULL;
 }
 
 /* Purpose:
@@ -196,4 +198,8 @@ void MemoryManager::free(string name)
         next->mStart = temp->mStart;
         delete temp;
     }
+
+    previous = NULL;
+    next = NULL;
+    temp = NULL;
 }
