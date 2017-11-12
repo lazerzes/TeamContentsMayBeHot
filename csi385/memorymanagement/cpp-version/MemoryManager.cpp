@@ -78,11 +78,11 @@ Node *MemoryManager::findNodeByName(string name)
     {
         if (temp->mName == name)
         {
-            break;
+            return temp;
         }
         temp = temp->mNext;
     }
-    return temp;
+    return NULL;
 }
 
 /* Purpose:
