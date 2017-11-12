@@ -31,7 +31,12 @@ Node::Node(uint start, uint size, string name, bool isEmpty)
 
     mName = name;
     mIsEmpty = isEmpty;
+}
 
+Node::~Node()
+{
+    mPrevious = NULL;
+    mNext = NULL;
 }
 
 MemoryManager::MemoryManager(uint capacity)
@@ -39,6 +44,11 @@ MemoryManager::MemoryManager(uint capacity)
     mHead = new Node(0, capacity, EMPTY, true);
     mAvailable = capacity;
     mTotal = capacity;
+}
+
+MemoryManager::~MemoryManager()
+{
+    mHead = NULL;
 }
 
 /* Purpose:
@@ -157,25 +167,33 @@ void MemoryManager::free(string name)
     temp->mName = EMPTY;
     temp->mIsEmpty = true;
 
-    // Case 2-A: Merge with previous
     Node *previous = temp->mPrevious;
+    Node *next = temp->mNext;
+
+    // Case 2-A: Merge with previous
     if (previous != NULL && previous->mIsEmpty)
     {
-        previous->mPrevious->mNext = temp;
-        temp->mPrevious = previous->mPrevious;
-        temp->mSize += previous->mSize;
-        delete previous;
+        previous->mNext = next;
+        if (next != NULL)
+        {
+            next->mPrevious = previous;
+        }
+        previous->mSize += temp->mSize;
+        delete temp;
+        temp = previous;
+        previous = temp->mPrevious;
     }
-    previous = NULL;
 
     // Case 2-B: Merge with next
-    Node *next = temp->mNext;
     if (next != NULL && next->mIsEmpty)
     {
-        next->mNext->mPrevious = temp;
-        temp->mNext = next->mNext;
-        temp->mSize += next->mSize;
-        delete next;
+        next->mPrevious = previous;
+        if (previous != NULL)
+        {
+            previous->mNext = next;
+        }
+        next->mSize += temp->mSize;
+        next->mStart = temp->mStart;
+        delete temp;
     }
-    next = NULL;
 }
