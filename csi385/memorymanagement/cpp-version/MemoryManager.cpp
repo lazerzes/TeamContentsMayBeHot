@@ -158,14 +158,24 @@ void MemoryManager::free(string name)
     temp->mIsEmpty = true;
 
     // Case 2-A: Merge with previous
-    if (temp->mPrevious != NULL)
+    Node *previous = temp->mPrevious;
+    if (previous != NULL && previous->mIsEmpty)
     {
-
+        previous->mPrevious->mNext = temp;
+        temp->mPrevious = previous->mPrevious;
+        temp->mSize += previous->mSize;
+        delete previous;
     }
+    previous = NULL;
 
     // Case 2-B: Merge with next
-    if (temp->mNext != NULL)
+    Node *next = temp->mNext;
+    if (next != NULL && next->mIsEmpty)
     {
-
+        next->mNext->mPrevious = temp;
+        temp->mNext = next->mNext;
+        temp->mSize += next->mSize;
+        delete next;
     }
+    next = NULL;
 }
