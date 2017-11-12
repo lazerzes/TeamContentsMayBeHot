@@ -24,7 +24,6 @@
 
 #include <iostream>
 #include <string>
-#include <vector>
 
 #define uint size_t
 
