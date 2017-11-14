@@ -10,7 +10,7 @@ public class OperatorExpression extends AbstractExpression<RPN>
 
     public OperatorExpression(String sym)
     {
-        this.mOperator = sym.indexOf(0);
+        this.mOperator = sym.charAt(0);
     }
 
     public void interpret(RPN context)
@@ -38,6 +38,6 @@ public class OperatorExpression extends AbstractExpression<RPN>
 
     public static boolean evaluate(String sym)
     {
-        return (OperatorExpression.OPERATORS.contains(sym));
+        return OperatorExpression.OPERATORS.contains(sym);
     }
 }
