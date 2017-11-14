@@ -34,21 +34,9 @@ public class RPN extends AbstractContext
         {
             tmp = null;
 
-            if (AdditionExpression.evaluate(sym))
+            if (OperatorExpression.evaluate(sym))
             {
-                tmp = new AdditionExpression();
-            }
-            else if (SubtractionExpression.evaluate(sym))
-            {
-                tmp = new SubtractionExpression();
-            }
-            else if (MultiplicationExpression.evaluate(sym))
-            {
-                tmp = new MultiplicationExpression();
-            }
-            else if (DivisionExpression.evaluate(sym))
-            {
-                tmp = new DivisionExpression();
+                tmp = new OperatorExpression(sym);
             }
             else if (OperandExpression.evaluate(sym))
             {
