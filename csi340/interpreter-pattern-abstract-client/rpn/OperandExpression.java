@@ -5,16 +5,16 @@ import interpreter.AbstractContext;
 
 public class OperandExpression extends AbstractExpression<RPN>
 {
-    private Double value;
+    private Double mValue;
 
     public OperandExpression(String sym)
     {
-        this.value = Double.parseDouble(sym);
+        this.mValue = Double.parseDouble(sym);
     }
 
     public void interpret(RPN context)
     {
-        context.push(this.value);
+        context.push(this.mValue);
     }
 
     public static boolean evaluate(String sym)
