@@ -59,13 +59,13 @@ class OptimizedPerceptronClassifier:
 
         "*** YOUR CODE HERE ***"
         for iteration in range(self.max_iterations):
-            print("Starting iteration {}...".format(iteration))
-            for datum, label in zip(training_data, training_labels):
-                datum_nparr = datum.values_as_numpy_array()
-                row = len(self.features)
-                col = len(self.legal_labels)
-                datum_expanded = np.resize(datum_nparr, (row, col))
-                datum_expanded = datum_expanded.astype(np.float64)*self.weights
+            data = np.array([datum.values_as_numpy_array() for datum in training_data])
+            labels = np.array(training_labels)
+            print(data[0], "LABEL:", labels[0]) # One datum with its label
+            print(data.shape) # 100 data points where each data point is an array of 784 samples
+            print(labels.shape) # 100 labels, one for each data point
+
+            quit()
 
     def classify(self, data):
         """
