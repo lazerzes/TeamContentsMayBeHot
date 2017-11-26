@@ -50,10 +50,10 @@ class PerceptronClassifier:
         Use the provided self.weights[label] data structure so that
         the classify method works correctly. Also, recall that a
         datum is a counter from features to values for those features
-        (and thus represents a vector a values).
-        
+        (and thus represents a vector of values).
+
         In this case, we will not use validation_data or validation_labels
-        
+
         Important: Do not change this function!
         """
 
@@ -66,19 +66,31 @@ class PerceptronClassifier:
 
     def perform_update(self, datum, label):
         """
-        Update the weights based on a single data point (datum) with the given 
+        Update the weights based on a single data point (datum) with the given
         label.
-        
+
         Use the provided self.weights[label] data structure so that
         the classify method works correctly. Also, recall that a
         datum is a counter from features to values for those features
-        (and thus represents a vector a values).
+        (and thus represents a vector of values).
         """
-        
-        "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
 
-    def classify(self, data ):
+        "*** YOUR CODE HERE ***"
+        # Calculate y' per the classify method below
+        vectors = util.Counter()
+        for l in self.legal_labels:
+            vectors[l] = self.weights[l] * datum
+        guess = vectors.arg_max()
+
+        # If y' = y then do nothing
+        if guess is label:
+            return
+
+        # Otherwise, strengthen the link for y and weaken the link for y'
+        self.weights[label] += datum
+        self.weights[guess] -= datum
+
+    def classify(self, data):
         """
         Classifies each datum as the label that most closely matches the prototype vector
         for that label.  See the project description for details.
@@ -92,4 +104,3 @@ class PerceptronClassifier:
                 vectors[l] = self.weights[l] * datum
             guesses.append(vectors.arg_max())
         return guesses
-        

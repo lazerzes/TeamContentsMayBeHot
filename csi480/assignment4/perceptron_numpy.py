@@ -45,8 +45,8 @@ class OptimizedPerceptronClassifier:
         times and updates the weight vector for each label based on classification errors.
         See the assignment description for details.
 
-        The data will still come in with each data point as a counter from 
-        features to values for those features (and thus represents a vector a values),
+        The data will still come in with each data point as a counter from
+        features to values for those features (and thus represents a vector of values),
         so you should first convert this to a numpy array using the
             counter.values_as_numpy_array
         method
@@ -57,10 +57,16 @@ class OptimizedPerceptronClassifier:
             self.features = list(training_data[0].keys()) # could be useful later
             self.weights = np.zeros((len(self.features), len(self.legal_labels)))
 
-        "*** YOUR CODE HERE ***" 
-        util.raise_not_defined()       
-        
-                    
+        "*** YOUR CODE HERE ***"
+        for iteration in range(self.max_iterations):
+            print("Starting iteration {}...".format(iteration))
+            for datum, label in zip(training_data, training_labels):
+                datum_nparr = datum.values_as_numpy_array()
+                row = len(self.features)
+                col = len(self.legal_labels)
+                datum_expanded = np.resize(datum_nparr, (row, col))
+                datum_expanded = datum_expanded.astype(np.float64)*self.weights
+
     def classify(self, data):
         """
         Classifies each datum as the label that most closely matches the prototype vector
@@ -71,27 +77,27 @@ class OptimizedPerceptronClassifier:
         """
         if self.weights is None:
             raise Exception("the perceptron must be trained before data can be classified")
-        
+
         # convert to numpy matrix
         data_matrix = np.asarray([datum.values_as_numpy_array() for datum in data])
-        
+
         "*** YOUR CODE HERE ***"
         util.raise_not_defined()
 
     def find_high_weight_features(self, label, num=100):
         """
-        Returns a list of num (default 100) features with the greatest weight 
+        Returns a list of num (default 100) features with the greatest weight
         for some label
-        
-        Hint: self.features stores the list of features names.  Here you will 
-        have to find which rows contain the largest values in the column of 
-        self.weights corresponding to the given label, and then return the 
+
+        Hint: self.features stores the list of features names.  Here you will
+        have to find which rows contain the largest values in the column of
+        self.weights corresponding to the given label, and then return the
         feature names for those rows
-        
+
         Hint: to get the keys of a dictionary sorted by their value you can do
 			sorted([key for key in dictionary.keys()], key=lambda k: dictionary[k])
 		You can also set some other function or lambda expression as the sort key
         """
-        
+
         "*** YOUR CODE HERE ***"
         util.raise_not_defined()
