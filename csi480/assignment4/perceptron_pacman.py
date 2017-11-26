@@ -36,7 +36,7 @@ class PerceptronClassifierPacman(PerceptronClassifier):
     def classify(self, data ):
         """
         Data contains a list of (datum, legal moves)
-        
+
         Datum is a Counter representing the features of each GameState.
         legal_moves is a list of legal moves for that GameState.
         """
@@ -58,4 +58,7 @@ class PerceptronClassifierPacman(PerceptronClassifier):
             print("Starting iteration ", iteration, "...")
             for (datum, legal_moves), label in zip(training_data, training_labels):
                 "*** YOUR CODE HERE ***"
-                util.raise_not_defined()
+                for guess in self.classify(datum):
+                    if guess != label:
+                        self.weights += datum[0][label]
+                        self.weights -= datum[0][guess]
