@@ -59,21 +59,21 @@ class OptimizedPerceptronClassifier:
 
         "*** YOUR CODE HERE ***"
         for iteration in range(self.max_iterations):
-            data_matrix = np.asarray([
-                datum.values_as_numpy_array() for datum in training_data
-            ])
+            data_matrix = np.asarray(
+                [datum.values_as_numpy_array() for datum in training_data]
+            ) # (100, 784)
 
-            weight_adjustment_matrix = np.zeros(
-                (len(self.features), len(self.legal_labels))
-            )
+            print("\nWEIGHTS:")
+            print(self.weights, self.weights.shape)
+            print("\nDATA:")
+            print(data_matrix, data_matrix.shape)
 
-            
-
-            self.weights += weight_adjustment_matrix
-
-            print(data_matrix.shape)
-            print(self.weights.shape)
-
+            for datum, label in zip(data_matrix, training_labels):
+                # Datum consists of 784 0|1 values representing the image
+                # Weight consists of 784 sets containing 10 output values each
+                print("\nDATUM:")
+                print(datum, datum.shape)
+                break
             quit()
 
 
