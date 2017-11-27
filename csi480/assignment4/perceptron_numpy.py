@@ -65,9 +65,9 @@ class OptimizedPerceptronClassifier:
             for datum, label in zip(data_matrix, training_labels):
                 # Datum consists of 784 0|1 values representing the image
                 # Weight consists of 784 sets containing 10 output values each
-                activation = datum.dot(self.weights)
-                prediction = np.max(activation, axis=0)
-                
+                activation = datum.dot(self.weights) # Array of 10 weighted outputs
+                prediction = np.max(activation, axis=0) # Output with highest weight
+
                 break
             quit()
 
