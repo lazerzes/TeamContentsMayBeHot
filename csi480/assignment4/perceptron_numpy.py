@@ -68,6 +68,9 @@ class OptimizedPerceptronClassifier:
                 activation = datum.dot(self.weights) # Array of 10 weighted outputs
                 prediction = np.max(activation, axis=0) # Output with highest weight
 
+                if prediction is not label:
+                    pass
+
                 break
             quit()
 
