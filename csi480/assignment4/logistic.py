@@ -28,7 +28,7 @@ import tensorflow as tf
 class SoftmaxClassifier:
     """
     A softmax (multinomial logistic regression) classifier.
-    
+
     This Class will perform softmax classification using TensorFlow
 
     Note that the variable 'datum' in this code refers to a counter of features
@@ -38,41 +38,63 @@ class SoftmaxClassifier:
         self.type = "logistic"
         self.max_iterations = max_iterations
         self.learning_rates = [0.2]
-        
+
         # create TensorFlow session
         self.sess = tf.InteractiveSession()
 
- 
+
     def train( self, training_data, training_labels, validation_data, validation_labels ):
         """
         The training loop for the softmax classifier passes through the training data several
         times and updates the weight vector for each label based on the cross entropy loss
-        
-        You will need to setup tensor flow variables, computation graph, 
+
+        You will need to setup tensor flow variables, computation graph,
         and optimization procedure, then run the training step self.max_iterations
         times.
-        
+
         This should be very similar to what is shown
            https://www.tensorflow.org/get_started/mnist/beginners
         except for where the data is coming from
-        
-        Important note: this should operate in batch mode, using all training_data 
+
+        Important note: this should operate in batch mode, using all training_data
             for each batch
         """
 
         self.features = list(training_data[0].keys()) # could be useful later
-        
+
         learning_rate = self.learning_rates[0]
-        
-        # Note: features should come into tf.placeholder self.x and output 
+
+        # Note: features should come into tf.placeholder self.x and output
         # should be in self.y to make the classify method work correctly.
         # If you use different variable names, then you will need to change
         # that method accordingly
-        
+
 
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
 
+        #Graph setup
+        self.x = tf.placeholder(tf.float32, [None, 784])
+        self.y = tf.placeholder(tf.float32, [None, 10])
+
+        #Model Weights
+        W = tf.Variable(tf.zeros([784, 10]))
+        b = tf.Variable(tf.zeros([10]))
+
+        model = tf.nn.softmax(tf.matmul(self.x, W) + b)
+        cross_entropy = tf.reduce_mean(-tf.reduce_sum(self.y*tf.log(self.y), reduction_indices=[1]))
+        train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy)
+
+        tf.global_variables_initializer().run()
+
+        self.sess.run()
+
+        for i in range(self.max_iterations):
+            average = 0
+            batch = int(training_data.size)
+            for x in range(batch):
+                batch_xs, batch_ys = training_data.next_batch(batch.size)
+                self.sess.run(train_step, feed_dict={self.x: batch_xs, self.y: batch_ys})
+                average += self.sess.run(cross_entropy, feed_dict={self.x: batch_xs, self.y: batch_ys})/ batch_xs
 
 
 
@@ -83,11 +105,11 @@ class SoftmaxClassifier:
 
         Recall that a datum is a util.counter...
         """
-        
+
         output = tf.argmax(self.y,1)
         return self.sess.run(output, feed_dict={self.x: [datum.values_as_numpy_array() for datum in data]})
-        
-        
+
+
 
 
     def find_high_weight_features(self, label, num=100):
@@ -95,7 +117,7 @@ class SoftmaxClassifier:
         Returns a list of the num features with the greatest weight for some label
         """
 
-        # this function is optional for this classifier, but if you want to 
+        # this function is optional for this classifier, but if you want to
         # visualize the weights of this classifier, you will need to implement
         # it
 
