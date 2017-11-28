@@ -59,7 +59,6 @@ class OptimizedPerceptronClassifier:
 
         "*** YOUR CODE HERE ***"
         for iteration in range(self.max_iterations):
-            blunders = 0
             data_matrix = np.asarray(
                 [datum.values_as_numpy_array() for datum in training_data]
             ) # (100, 784)
@@ -69,12 +68,10 @@ class OptimizedPerceptronClassifier:
                 # Weight consists of 784 sets containing 10 output values each
                 activation = datum.dot(self.weights) # Array of 10 weighted outputs
                 prediction = np.argmax(activation, axis=0) # Index with highest weight
-                
+
                 if prediction != label:
                     self.weights[:,prediction] -= datum
                     self.weights[:,label] += datum
-                    blunders += 1
-            print(blunders, "/", len(training_labels))
 
     def classify(self, data):
         """
@@ -91,7 +88,12 @@ class OptimizedPerceptronClassifier:
         data_matrix = np.asarray([datum.values_as_numpy_array() for datum in data])
 
         "*** YOUR CODE HERE ***"
-        util.raise_not_defined()
+        guesses = []
+        for datum in data_matrix:
+            activation = datum.dot(self.weights)
+            prediction = np.argmax(activation, axis=0)
+            guesses.append(prediction)
+        return guesses
 
     def find_high_weight_features(self, label, num=100):
         """
