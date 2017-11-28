@@ -58,7 +58,10 @@ class PerceptronClassifierPacman(PerceptronClassifier):
             print("Starting iteration ", iteration, "...")
             for (datum, legal_moves), label in zip(training_data, training_labels):
                 "*** YOUR CODE HERE ***"
-                for guess in self.classify(datum):
-                    if guess != label:
-                        self.weights += datum[0][label]
-                        self.weights -= datum[0][guess]
+                vectors = util.Counter()
+                for l in legal_moves:
+                    vectors[l] = self.weights * datum[l]
+                guess = vectors.arg_max()
+                if guess != label:
+                    self.weights += datum[label]
+                    self.weights -= datum[guess]
