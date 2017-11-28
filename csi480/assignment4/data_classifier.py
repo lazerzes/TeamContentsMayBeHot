@@ -86,6 +86,8 @@ def enhanced_feature_extractor_digit(datum):
     features =  basic_feature_extractor_digit(datum)
 
     "*** YOUR CODE HERE ***"
+    print(features)
+    quit()
     util.raise_not_defined()
 
     return features
@@ -132,7 +134,26 @@ def enhanced_pacman_features(state, action):
     """
     features = util.Counter()
     "*** YOUR CODE HERE ***"
-    util.raise_not_defined()
+    successor_state = state.generate_pacman_successor(action)
+    pacman_position = successor_state.get_pacman_position()
+    food_states = successor_state.get_food()
+    ghost_states = successor_state.get_ghost_states()
+    scared_times = [gs.scared_timer for gs in ghost_states]
+
+
+    ghost_positions = []
+    scared_ghost_positions = []
+    for ghost_state, scared_time in zip(ghost_states, scared_times)
+
+
+    ghost_positions = [gs.get_position() for gs in ghost_states if gs.scared_timer > 0]
+    ghost_distances = [util.manhattan_distance(gp, pacman_position) for gp in ghost_positions]
+
+    food_positions = food_states.as_list()
+    food_distances = [util.manhattan_distance(fp, pacman_position) for fp in food_positions]
+
+    quit()
+
     return features
 
 
@@ -217,8 +238,8 @@ class ImagePrinter:
             except:
                 print("new features:", pix)
                 continue
-                
-        if ax:            
+
+        if ax:
             pixels = np.asarray(np.asarray(image.pixels).T)
             im = np.zeros((pixels.shape[0], pixels.shape[1],3))
             im[pixels>=1] = [0,1,0]
@@ -267,7 +288,7 @@ def read_command( argv ):
     parser.add_option('-i', '--iterations', help=default("Maximum iterations to run training"), default=3, type="int")
     parser.add_option('-s', '--test', help=default("Amount of test data to use"), default=TEST_SET_SIZE, type="int")
     parser.add_option('-g', '--agent_to_clone', help=default("Pacman agent to copy"), default=None, type="str")
-    parser.add_option('-l', '--learning_rates', help=default("Learning rates to use for gradient descent, can be a comma separated list or single value"), 
+    parser.add_option('-l', '--learning_rates', help=default("Learning rates to use for gradient descent, can be a comma separated list or single value"),
                       default=[0.2], type="str", action='callback', callback=learning_rate_callback)
 
 
@@ -387,7 +408,7 @@ def run_classifier(args, options):
     feature_function = args['feature_function']
     classifier = args['classifier']
     print_image = args['print_image']
-    
+
     # Load data
     num_training = options.training
     num_test = options.test
