@@ -59,18 +59,22 @@ class OptimizedPerceptronClassifier:
 
         "*** YOUR CODE HERE ***"
         for iteration in range(self.max_iterations):
+            blunders = 0
             data_matrix = np.asarray(
                 [datum.values_as_numpy_array() for datum in training_data]
             ) # (100, 784)
+
             for datum, label in zip(data_matrix, training_labels):
                 # Datum consists of 784 0|1 values representing the image
                 # Weight consists of 784 sets containing 10 output values each
                 activation = datum.dot(self.weights) # Array of 10 weighted outputs
-                prediction = np.max(activation, axis=0) # Output with highest weight
-
-                break
-            quit()
-
+                prediction = np.argmax(activation, axis=0) # Index with highest weight
+                
+                if prediction != label:
+                    self.weights[:,prediction] -= datum
+                    self.weights[:,label] += datum
+                    blunders += 1
+            print(blunders, "/", len(training_labels))
 
     def classify(self, data):
         """
