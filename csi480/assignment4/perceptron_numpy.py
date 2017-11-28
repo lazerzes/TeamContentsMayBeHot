@@ -69,19 +69,11 @@ class OptimizedPerceptronClassifier:
                 # Weight consists of 784 sets containing 10 output values each
                 activation = datum.dot(self.weights) # Array of 10 weighted outputs
                 prediction = np.argmax(activation, axis=0) # Index with highest weight
-                correct_activation = np.zeros(len(self.legal_labels))
-                correct_activation[label] = 1
-
+                
                 if prediction != label:
-                    self.weights[:,] += 
-                    quit()
-
-                for i, w, x in zip(range(len(datum)), datum, self.weights):
-                    print("px#:{}  x:{}  wg:{}".format(i, w, x))
-                print(" ACT:{}  GUESS:{}".format(activation, prediction))
-                print("GOAL:{}  LABEL:{}".format(correct_activation, label))
-                quit()
-
+                    self.weights[:,prediction] -= datum
+                    self.weights[:,label] += datum
+                    blunders += 1
             print(blunders, "/", len(training_labels))
 
     def classify(self, data):
