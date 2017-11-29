@@ -71,9 +71,11 @@ class SoftmaxClassifier:
 
 
         "*** YOUR CODE HERE ***"
-        data_matrix = np.asarray(
+        batch_xs = np.asarray(
             [datum.values_as_numpy_array() for datum in training_data]
-        ) # (100, 784)
+        )
+        batch_ys = np.asarray(training_labels)
+        print(batch_xs.shape, batch_ys.shape)
 
         self.x = tf.placeholder(tf.float32, [None, 784])
         W = tf.Variable(tf.zeros([784, 10]))
@@ -88,8 +90,7 @@ class SoftmaxClassifier:
 
         for _ in range(self.max_iterations):
             average = 0
-            for batch_xs, batch_ys in zip(data_matrix, training_labels):
-                self.sess.run(train_step, feed_dict={self.x: batch_xs, self.y: batch_ys})
+            self.sess.run(train_step, feed_dict={self.x: batch_xs, self.y: batch_ys})
 
     def classify(self, data ):
         """
