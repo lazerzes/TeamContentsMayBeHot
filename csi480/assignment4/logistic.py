@@ -69,13 +69,14 @@ class SoftmaxClassifier:
         # If you use different variable names, then you will need to change
         # that method accordingly
 
-
         "*** YOUR CODE HERE ***"
+        batch_size = len(training_labels)
         batch_xs = np.asarray(
             [datum.values_as_numpy_array() for datum in training_data]
         )
-        batch_ys = np.asarray(training_labels)
-        print(batch_xs.shape, batch_ys.shape)
+        batch_ys = np.zeros((batch_size, 10))
+        batch_ys[np.arange(batch_size), training_labels] = 1
+        # Source: https://stackoverflow.com/a/29831596
 
         self.x = tf.placeholder(tf.float32, [None, 784])
         W = tf.Variable(tf.zeros([784, 10]))
