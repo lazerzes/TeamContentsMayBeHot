@@ -81,17 +81,18 @@ class SoftmaxClassifier:
         self.x = tf.placeholder(tf.float32, [None, 784])
         W = tf.Variable(tf.zeros([784, 10]))
         b = tf.Variable(tf.zeros([10]))
-        prediction = tf.nn.softmax(tf.matmul(self.x, W) + b)
+        y = tf.nn.softmax(tf.matmul(self.x, W) + b)
 
-        self.y = tf.placeholder(tf.float32, [None, 10])
-        cross_entropy = tf.reduce_mean(-tf.reduce_sum(self.y*tf.log(prediction), reduction_indices=[1]))
+        y_ = tf.placeholder(tf.float32, [None, 10])
+        cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
         train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy)
 
         tf.global_variables_initializer().run()
 
         for _ in range(self.max_iterations):
             average = 0
-            self.sess.run(train_step, feed_dict={self.x: batch_xs, self.y: batch_ys})
+            self.sess.run(train_step, feed_dict={self.x: batch_xs, y_: batch_ys})
+        self.y = y
 
     def classify(self, data ):
         """
