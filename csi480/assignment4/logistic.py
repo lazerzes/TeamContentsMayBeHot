@@ -71,32 +71,25 @@ class SoftmaxClassifier:
 
 
         "*** YOUR CODE HERE ***"
+        data_matrix = np.asarray(
+            [datum.values_as_numpy_array() for datum in training_data]
+        ) # (100, 784)
 
-        #Graph setup
         self.x = tf.placeholder(tf.float32, [None, 784])
-        self.y = tf.placeholder(tf.float32, [None, 10])
-
-        #Model Weights
         W = tf.Variable(tf.zeros([784, 10]))
         b = tf.Variable(tf.zeros([10]))
+        prediction = tf.nn.softmax(tf.matmul(self.x, W) + b)
 
-        model = tf.nn.softmax(tf.matmul(self.x, W) + b)
-        cross_entropy = tf.reduce_mean(-tf.reduce_sum(self.y*tf.log(self.y), reduction_indices=[1]))
+        self.y = tf.placeholder(tf.float32, [None, 10])
+        cross_entropy = tf.reduce_mean(-tf.reduce_sum(self.y*tf.log(prediction), reduction_indices=[1]))
         train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy)
 
         tf.global_variables_initializer().run()
 
-        self.sess.run()
-
-        for i in range(self.max_iterations):
+        for _ in range(self.max_iterations):
             average = 0
-            batch = int(training_data.size)
-            for x in range(batch):
-                batch_xs, batch_ys = training_data.next_batch(batch.size)
+            for batch_xs, batch_ys in zip(data_matrix, training_labels):
                 self.sess.run(train_step, feed_dict={self.x: batch_xs, self.y: batch_ys})
-                average += self.sess.run(cross_entropy, feed_dict={self.x: batch_xs, self.y: batch_ys})/ batch_xs
-
-
 
     def classify(self, data ):
         """
