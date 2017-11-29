@@ -135,24 +135,49 @@ def enhanced_pacman_features(state, action):
     features = util.Counter()
     "*** YOUR CODE HERE ***"
     successor_state = state.generate_pacman_successor(action)
+    score = successor_state.get_score()
     pacman_position = successor_state.get_pacman_position()
     food_states = successor_state.get_food()
     ghost_states = successor_state.get_ghost_states()
-    scared_times = [gs.scared_timer for gs in ghost_states]
 
+    # Feature 1: Game score
+    features['Score'] = score
 
-    ghost_positions = []
-    scared_ghost_positions = []
-    for ghost_state, scared_time in zip(ghost_states, scared_times)
+    # Feature 2: Shortest manhattan distance between Pacman and a ghost
+    ghost_positions = [gs.get_position()
+        for gs in ghost_states if gs.scared_timer == 0
+    ]
+    if ghost_positions:
+        ghost_distances = [util.manhattan_distance(gp, pacman_position)
+            for gp in ghost_positions
+        ]
+        features['Ghost'] = min(ghost_distances)
 
+    # Feature 3: Shortest manhattan distance between Pacman and a scared ghost
+    scared_positions = [gs.get_position()
+        for gs in ghost_states if gs.scared_timer > 0
+    ]
+    if scared_positions:
+        scared_distances = [util.manhattan_distance(gp, pacman_position)
+            for gp in scared_positions
+        ]
+        features['Scared'] = min(scared_distances)
 
-    ghost_positions = [gs.get_position() for gs in ghost_states if gs.scared_timer > 0]
-    ghost_distances = [util.manhattan_distance(gp, pacman_position) for gp in ghost_positions]
-
+    # Feature 4: Shortest manhattan distance between Pacman and a food pellet
     food_positions = food_states.as_list()
-    food_distances = [util.manhattan_distance(fp, pacman_position) for fp in food_positions]
+    if food_positions:
+        food_distances = [util.manhattan_distance(fp, pacman_position)
+            for fp in food_positions
+        ]
+        features['Food'] = min(food_distances)
 
-    quit()
+    # Feature 5: Shortest manhattan distance between Pacman and a capsule
+    capsule_positions = successor_state.get_capsules()
+    if capsule_positions:
+        capsule_distances = [util.manhattan_distance(cp, pacman_position)
+            for cp in capsule_positions
+        ]
+        features['Capsule'] = min(capsule_distances)
 
     return features
 
