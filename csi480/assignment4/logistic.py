@@ -70,29 +70,30 @@ class SoftmaxClassifier:
         # that method accordingly
 
         "*** YOUR CODE HERE ***"
-        batch_size = len(training_labels)
-        batch_xs = np.asarray(
-            [datum.values_as_numpy_array() for datum in training_data]
-        )
-        batch_ys = np.zeros((batch_size, 10))
-        batch_ys[np.arange(batch_size), training_labels] = 1
-        # Source: https://stackoverflow.com/a/29831596
+        for lr in self.learning_rates:
+            batch_size = len(training_labels)
+            batch_xs = np.asarray(
+                [datum.values_as_numpy_array() for datum in training_data]
+            )
+            batch_ys = np.zeros((batch_size, 10))
+            batch_ys[np.arange(batch_size), training_labels] = 1
+            # Source: https://stackoverflow.com/a/29831596
 
-        self.x = tf.placeholder(tf.float32, [None, 784])
-        W = tf.Variable(tf.zeros([784, 10]))
-        b = tf.Variable(tf.zeros([10]))
-        y = tf.nn.softmax(tf.matmul(self.x, W) + b)
+            self.x = tf.placeholder(tf.float32, [None, 784])
+            W = tf.Variable(tf.zeros([784, 10]))
+            b = tf.Variable(tf.zeros([10]))
+            y = tf.nn.softmax(tf.matmul(self.x, W) + b)
 
-        y_ = tf.placeholder(tf.float32, [None, 10])
-        cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
-        train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(cross_entropy)
+            y_ = tf.placeholder(tf.float32, [None, 10])
+            cross_entropy = tf.reduce_mean(-tf.reduce_sum(y_ * tf.log(y), reduction_indices=[1]))
+            train_step = tf.train.GradientDescentOptimizer(lr).minimize(cross_entropy)
 
-        tf.global_variables_initializer().run()
+            tf.global_variables_initializer().run()
 
-        for _ in range(self.max_iterations):
-            average = 0
-            self.sess.run(train_step, feed_dict={self.x: batch_xs, y_: batch_ys})
-        self.y = y
+            for _ in range(self.max_iterations):
+                average = 0
+                self.sess.run(train_step, feed_dict={self.x: batch_xs, y_: batch_ys})
+            self.y = y
 
     def classify(self, data ):
         """
