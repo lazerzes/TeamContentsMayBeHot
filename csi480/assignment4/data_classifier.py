@@ -1,5 +1,25 @@
 """data_classifier.py
 
+Author: Rei Armenia, Matthew James Harrison
+Class: CSI-480 AI
+Assignment: Supervised Learning Programming Assignment
+Due Date: November 28, 2017
+
+Description:
+Which digit? Which action?
+
+Certification of Authenticity:
+I certify that this is entirely my own work, except where I have given
+fully-documented references to the work of others. I understand the definition
+and consequences of plagiarism and acknowledge that the assessor of this
+assignment may, for the purpose of assessing this assignment:
+ - Reproduce this assignment and provide a copy to another member of academic
+   staff; and/or
+ - Communicate a copy of this assignment to a plagiarism checking service
+   (which may then retain a copy of this assignment on its database for the
+   purpose of future plagiarism checking)
+
+----------------------
 This file contains feature extraction methods and harness
 code for data classification
 
@@ -86,10 +106,6 @@ def enhanced_feature_extractor_digit(datum):
     features =  basic_feature_extractor_digit(datum)
 
     "*** YOUR CODE HERE ***"
-    print(features)
-    quit()
-    util.raise_not_defined()
-
     return features
 
 
