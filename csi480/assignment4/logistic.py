@@ -70,6 +70,7 @@ class SoftmaxClassifier:
         # that method accordingly
 
         "*** YOUR CODE HERE ***"
+        results = []
         for lr in self.learning_rates:
             batch_size = len(training_labels)
             batch_xs = np.asarray(
@@ -91,9 +92,19 @@ class SoftmaxClassifier:
             tf.global_variables_initializer().run()
 
             for _ in range(self.max_iterations):
-                average = 0
                 self.sess.run(train_step, feed_dict={self.x: batch_xs, y_: batch_ys})
             self.y = y
+
+            correct_prediction = tf.equal(tf.argmax(y,1), tf.argmax(y_,1))
+            accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+            a = self.sess.run(accuracy, feed_dict={self.x: batch_xs, y_: batch_ys})
+            results.append((lr, a))
+        best_lr = max(results, key=lambda x: x[1])[0]
+
+        train_step = tf.train.GradientDescentOptimizer(best_lr).minimize(cross_entropy)
+        for _ in range(self.max_iterations):
+            self.sess.run(train_step, feed_dict={self.x: batch_xs, y_: batch_ys})
+        self.y = y
 
     def classify(self, data ):
         """
