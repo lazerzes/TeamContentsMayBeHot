@@ -59,8 +59,8 @@ class BaseAgent(CaptureAgent):
         CaptureAgent.register_initial_state(self, game_state)
 
         self.pos_start = game_state.get_agent_position(self.index)
-        self.num_foods = len(self.get_food(game_state).asList())
-        self.ini_foods = len(self.get_food(game_state).asList())
+        self.num_foods = len(self.get_food(game_state).as_list())
+        self.ini_foods = len(self.get_food(game_state).as_list())
 
     def choose_action(self, game_state):
         """
@@ -126,7 +126,7 @@ class DefenseAgent(BaseAgent):
     """
     def get_features(self, game_state, action):
 
-        util.raise_not_defined()
+        score = get_score(game_state)
 
     def get_weights(self, game_state, action):
 
