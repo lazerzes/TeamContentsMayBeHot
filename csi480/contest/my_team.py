@@ -70,6 +70,12 @@ class BaseAgent(CaptureAgent):
         evaluation = [self.evaluate(game_state, action) for action in actions]
 
         best_actions = [action for action, value in zip(actions, values) if value == max(values)]
+        food_left = len(self.get_food(game_state).as_list())
+
+        " Get The Team's State "
+        team = [game_state.get_agent_state(agent) for agent in self.get_team(game_state)]
+
+
 
         util.raise_not_defined()
 
