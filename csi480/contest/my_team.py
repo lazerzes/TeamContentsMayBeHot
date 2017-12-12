@@ -69,6 +69,8 @@ class BaseAgent(CaptureAgent):
         actions = game_state.get_legal_actions(self.index)
         evaluation = [self.evaluate(game_state, action) for action in actions]
 
+        best_actions = [action for action, value in zip(actions, values) if value == max(values)]
+
         util.raise_not_defined()
 
     def get_successor(self, game_state, action):
