@@ -51,6 +51,84 @@ def create_team(first_index, second_index, is_red,
 ##########
 # Agents #
 ##########
+class BaseAgent(CaptureAgent):
+    """
+        Shared Code from between both Offense and Defense
+    """
+    def register_initial_state(self, game_state):
+        CaptureAgent.register_initial_state(self, game_state)
+
+        self.pos_start = game_state.get_agent_position(self.index)
+        self.num_foods = len(self.get_food(game_state).asList())
+        self.ini_foods = len(self.get_food(game_state).asList())
+
+    def choose_action(self, game_state):
+        """
+            Choose what action to take
+        """
+        actions = game_state.get_legal_actions(self.index)
+        evaluation = [self.evaluate(game_state, action) for action in actions]
+
+        util.raise_not_defined()
+
+    def get_successor(self, game_state, action):
+        """
+            Get the next successor (location tuple)
+        """
+
+        util.raise_not_defined()
+
+    def evaluate(self, game_state, action):
+        """
+            Evaluation Function --- No Need to Override
+        """
+
+        features = self.get_features(game_state, action)
+        weights = self.get_weights(game_state, action)
+
+        return (features * weights)
+
+    def get_features(self, game_state, action):
+
+        features = util.Counter()
+        successor = get_successor(game_state)
+
+        features['successor'] = self.get_score(successor)
+        return features
+
+    def get_weights(self):
+        return {'successor':1.0}
+
+    def euclidean_heuristic(position, problem, info={}):
+        "The Euclidean distance heuristic for a PositionSearchProblem -- Copied from Assignment 1"
+        xy1 = position
+        xy2 = problem.goal
+        return ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
+
+
+class OffenseAgent(BaseAgent):
+    """
+        REDO Weights for Offense
+    """
+    def get_features(self, game_state, action):
+
+        util.raise_not_defined()
+
+    def get_weights(self, game_state, action):
+
+        util.raise_not_defined()
+
+class DefenseAgent(BaseAgent):
+    """
+        REDO Weights for Defense
+    """
+    def get_features(self, game_state, action):
+
+        util.raise_not_defined()
+
+    def get_weights(self, game_state, action):
+
+        util.raise_not_defined()
 
 class DummyAgent(CaptureAgent):
     """
