@@ -29,7 +29,7 @@ import game
 #################
 
 def create_team(first_index, second_index, is_red,
-               first='DummyAgent', second='DummyAgent'):
+               first='OffenseAgent', second='DefenseAgent'):
     """
     This function should return a list of two agents that will form the
     team, initialized using first_index and second_index as their agent
