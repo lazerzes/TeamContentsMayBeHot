@@ -66,12 +66,12 @@ class BaseAgent(CaptureAgent):
             Choose what action to take
         """
         actions = game_state.get_legal_actions(self.index)
-        evaluation = [self.evaluate(game_state, action) for action in actions]
-
+        values = [self.evaluate(game_state, action) for action in actions]
         best_actions = [
-            action for action, value in zip(actions, evaluation)
-            if value == max(evaluation)
+            action for action, value in zip(actions, values)
+            if value == max(values)
             ]
+
         food_left = len(self.get_food(game_state).as_list())
 
         " Get The Team's State "
@@ -81,6 +81,8 @@ class BaseAgent(CaptureAgent):
             ]
         offense = team[0]
         defense = team[1]
+
+        return random.choice(best_actions)
 
         """
             Chech to see if either agent is currently pacman, self.index 0 will
