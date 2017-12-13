@@ -58,31 +58,43 @@ class BaseAgent(CaptureAgent):
     def register_initial_state(self, game_state):
         CaptureAgent.register_initial_state(self, game_state)
 
-        self.pos_start = game_state.get_agent_position(self.index)
-        self.num_foods = len(self.get_food(game_state).as_list())
+        self.start = game_state.get_agent_position(self.index)
+        self.food_count = len(self.get_food(game_state).as_list())
 
     def choose_action(self, game_state):
         """
             Choose what action to take
         """
-        actions = game_state.get_legal_actions(self.index)
-        values = [self.evaluate(game_state, action) for action in actions]
+        legal_actions = game_state.get_legal_actions(self.index)
+        values = [self.evaluate(game_state, action) for action in legal_actions]
         best_actions = [
-            action for action, value in zip(actions, values)
+            action for action, value in zip(legal_actions, values)
             if value == max(values)
             ]
 
-        food_left = len(self.get_food(game_state).as_list())
+        remaining_food = len(self.get_food(game_state).as_list())
+        '''
+        # Special case for food<=2, from baseline team
+        if remaining_food <= 2:
+            best_distance = float("inf")
+            for action in legal_actions:
+                successor = self.get_successor(game_state, action)
+                new_position = successor.get_agent_position(self.index)
+                distance = self.get_maze_distance(self.start, new_position)
+                if distance < best_distance:
+                    best_action = action
+                    best_distance = distance
+            return best_action
+        '''
+        return random.choice(best_actions)
 
-        " Get The Team's State "
+        # Get the team state
         team = [
             game_state.get_agent_state(agent)
             for agent in self.get_team(game_state)
             ]
         offense = team[0]
         defense = team[1]
-
-        return random.choice(best_actions)
 
         """
             Chech to see if either agent is currently pacman, self.index 0 will
@@ -95,29 +107,29 @@ class BaseAgent(CaptureAgent):
         # If neither is pacman then just update our current food count
         if (not offense.is_pacman and not defense.is_pacman
                 and self.index == 0):
-            self.num_foods = food_left
+            self.food_count = remaining_food
         # If Offense is pacman then get the current amount of food eaten
         elif (offense.is_pacman and not defense.is_pacman
                 and self.index == 0):
-            dif_foods = self.num_foods - food_left
+            dif_foods = self.food_count - remaining_food
             if (dif_foods >= 5):
                 distance = float("inf")
-                for action in actions:
+                for action in legal_actions:
                     successor = self.get_successor(game_state, action)
-                    pos_successor = successor.get_agent_position(self.index)
-                    temp = self.get_maze_distance(self.pos_start, pos_successor)
+                    new_position = successor.get_agent_position(self.index)
+                    temp = self.get_maze_distance(self.start, new_position)
                     if(temp < distance):
-                        best_action = actions
+                        best_action = legal_actions
                         distance = temp
                     return best_action
-            elif (food_left == 0 and dif_foods > 0):
+            elif (remaining_food == 0 and dif_foods > 0):
                 distance = float("inf")
-                for action in actions:
+                for action in legal_actions:
                     next_state = self.get_successor(self.index, action)
-                    pos_successor = successor.get_agent_position(self.index)
-                    temp = self.get_maze_distance(self.start, pos_successor)
+                    new_position = successor.get_agent_position(self.index)
+                    temp = self.get_maze_distance(self.start, new_position)
                     if(temp < distance):
-                        best_action = actions
+                        best_action = legal_actions
                         distance = temp
                     return best_action
         return random.choice(best_actions)
@@ -162,7 +174,6 @@ class BaseAgent(CaptureAgent):
         xy2 = problem.goal
         return ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
     """
-
 
 class OffenseAgent(BaseAgent):
     """
@@ -281,7 +292,7 @@ class DefenseAgent(BaseAgent):
             'num_invaders': -1000,
             'invader_distance': -10,
             'stop': -1000,
-            'reverse': -2
+            'reverse': -5
             }
 
 class DummyAgent(CaptureAgent):
