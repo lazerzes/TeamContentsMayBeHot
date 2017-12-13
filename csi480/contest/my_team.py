@@ -68,11 +68,17 @@ class BaseAgent(CaptureAgent):
         actions = game_state.get_legal_actions(self.index)
         evaluation = [self.evaluate(game_state, action) for action in actions]
 
-        best_actions = [action for action, value in zip(actions, evaluation) if value == max(evaluation)]
+        best_actions = [
+            action for action, value in zip(actions, evaluation)
+            if value == max(evaluation)
+            ]
         food_left = len(self.get_food(game_state).as_list())
 
         " Get The Team's State "
-        team = [game_state.get_agent_state(agent) for agent in self.get_team(game_state)]
+        team = [
+            game_state.get_agent_state(agent)
+            for agent in self.get_team(game_state)
+            ]
         offense = team[0]
         defense = team[1]
 
@@ -122,7 +128,7 @@ class BaseAgent(CaptureAgent):
         successor_pos = successor.get_agent_state(self.index).get_position()
 
         #Align to Grid
-        if(successor_pos != util.nearest_point(successor_pos)):
+        if (successor_pos != util.nearest_point(successor_pos)):
             return successor.generate_successor(self.index, action)
 
         return successor
@@ -177,19 +183,34 @@ class OffenseAgent(BaseAgent):
             features['distance_to_food'] = distance_to_food
 
         # Get enemies and seperate them into both ghosts and pacmans
-        enemies = [successor.get_agent_state(num) for num in self.get_opponents(successor)]
-        enemy_ghosts = [agent for agent in enemies if not agent.is_pacman and agent.get_position() is not None]
-        enemy_pacmans = [agent for agent in enemies if agent.is_pacman and agent.get_position() is not None]
+        enemies = [
+            successor.get_agent_state(num)
+            for num in self.get_opponents(successor)
+            ]
+        enemy_ghosts = [
+            agent for agent in enemies if not agent.is_pacman
+            and agent.get_position() is not None
+            ]
+        enemy_pacmans = [
+            agent for agent in enemies if agent.is_pacman
+            and agent.get_position() is not None
+            ]
 
         # Avoid enemy ghosts
         if(len(enemy_ghosts) > 0):
-            ghost_min = min([self.get_maze_distance(successor_pos, ghost_pos.get_position()) for ghost_pos in enemy_ghosts])
+            ghost_min = min(
+                [self.get_maze_distance(successor_pos, ghost_pos.get_position())
+                for ghost_pos in enemy_ghosts
+                ])
             features['ghost_distance'] = ghost_min
 
 
         # If a Pacman is happened upon, go after it
         if(len(enemy_pacmans) > 0):
-            pacman_min = min([self.get_maze_distance(successor_pos, pac_pos.get_position()) for pac_pos in enemy_pacmans])
+            pacman_min = min([
+                self.get_maze_distance(successor_pos, pac_pos.get_position())
+                for pac_pos in enemy_pacmans
+                ])
             if(pacman_min <= 3):
                 features['pacman_distance'] = pacman_min
             else:
