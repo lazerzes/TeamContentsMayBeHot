@@ -338,3 +338,72 @@ class DummyAgent(CaptureAgent):
         '''
 
         return random.choice(actions)
+
+class ExpectimaxAgent(CaptureAgent):
+    def __get_next_index(self, index):
+        index += 1
+        if index > 3:
+            index = 0
+        return index
+
+    def register_initial_state:
+        self.start = game_state.get_agent_position(self.index)
+        self.depth = 2
+        self.team = get_team()
+        if self.index == team[0]:
+            self.get_features = get_offensive_features
+            self.get_weights = get_offensive_weights
+        else:
+            self.get_features = get_defensive_features
+            self.get_weights = get_defensive_weights
+        CaptureAgent.register_initial_state(self, game_state)
+
+    def evaluate(self, game_state, action):
+        features = self.get_features(game_state, action)
+        weights = self.get_weights(game_state, action)
+        return features * weights
+
+    def get_max(self, game_state, agent_index, depth):
+        if game_state.is_win() or game_state.is_lose():
+            return self.evaluate(game_state)
+
+        legal_actions = game_state.get_legal_actions(agent_index)
+        score = -float('inf')-1
+
+        for action in legal_actions:
+            next_state = game_state.generate_successor(agent_index, action)
+            next_index = self.__get_next_index(agent_index)
+            score = max(score, self.get_expected(next_state, next_index, depth))
+        return score
+
+    def get_expected(self, game_state, agent_index, depth):
+        if game_state.is_win() or game_state.is_lose():
+            return self.evaluate(game_state)
+
+        legal_actions = game_state.get_legal_actions(agent_index)
+        total_value = 0
+
+        for action in legal_actions:
+            next_state = game_state.generate_successor(agent_index, action)
+            next_index = __get_next_index(agent_index)
+            total_value += self.get_max(next_state, next_index, depth-1)
+        return total_value / len(legal_actions)
+
+    def get_action(self, game_state):
+        if game_state.is_win() or game_state.is_lose():
+            return self.evaluate(game_state)
+
+        legal_actions = game_state.get_legal_actions(self.index)
+        preferred_action = Directions.STOP
+        score = -float('inf')-1
+
+        for action in legal_actions:
+            next_state = game_state.generate_successor(self.index, action)
+            previous_score = score
+            next_index = __get_next_index(self.index)
+            score = max(score, self.get_expected(next_state,
+                                                 next_index,
+                                                 self.depth))
+            if score > previous_score:
+                preferred_action = action
+        return preferred_action
