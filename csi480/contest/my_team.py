@@ -221,7 +221,7 @@ class DefenseAgent(BaseAgent):
 
         # Score feature
         features['successor_score'] = self.get_score(successor)
-
+        '''
         # Movement features
         if action == Directions.STOP:
             features['stop'] = 1
@@ -247,7 +247,7 @@ class DefenseAgent(BaseAgent):
             features['invader_distance'] = min_distance
 
         # TODO Create a positive feature based on maze distance
-
+        '''
         return features
 
     def get_weights(self, game_state, action):
