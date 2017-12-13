@@ -84,33 +84,34 @@ class BaseAgent(CaptureAgent):
             too eat(current score heald by pac man) is greater than 5
             if it is we want it to return to its base.
         """
-        if(not offense.is_pacman and not defense.is_pacman and self.index == 0):
-            #If neither is pacman we dont care, just update our current food count.
+        # If neither is pacman then just update our current food count
+        if (not offense.is_pacman and not defense.is_pacman
+                and self.index == 0):
             self.num_foods = food_left
-        elif(offense.is_pacman and not defense.is_pacman and self.index == 0):
-                #If Offense is pacman then get the current ammount of food eaten
-                dif_foods = self.num_foods - food_left
-                if(dif_foods >= 5):
-                    distance = float("inf")
-                    for action in actions:
-                        next_state = self.get_successor(self.index, action)
-                        temp = self.get_maze_distance(self.start, successor.get_agent_position(self.index))
-                        if(temp < distance):
-                            best_action = actions
-                            distance = temp
-                        return best_action
-                elif(food_left == 0 and dif_foods > 0):
-                    distance = float("inf")
-                    for action in actions:
-                        next_state = self.get_successor(self.index, action)
-                        temp = self.get_maze_distance(self.start, successor.get_agent_position(self.index))
-                        if(temp < distance):
-                            best_action = actions
-                            distance = temp
-                        return best_action
-
-
-
+        # If Offense is pacman then get the current amount of food eaten
+        elif (offense.is_pacman and not defense.is_pacman
+                and self.index == 0):
+            dif_foods = self.num_foods - food_left
+            if (dif_foods >= 5):
+                distance = float("inf")
+                for action in actions:
+                    successor = self.get_successor(game_state, action)
+                    pos_successor = successor.get_agent_position(self.index)
+                    temp = self.get_maze_distance(self.pos_start, pos_successor)
+                    if(temp < distance):
+                        best_action = actions
+                        distance = temp
+                    return best_action
+            elif (food_left == 0 and dif_foods > 0):
+                distance = float("inf")
+                for action in actions:
+                    next_state = self.get_successor(self.index, action)
+                    pos_successor = successor.get_agent_position(self.index)
+                    temp = self.get_maze_distance(self.start, pos_successor)
+                    if(temp < distance):
+                        best_action = actions
+                        distance = temp
+                    return best_action
         return random.choice(best_actions)
 
     def get_successor(self, game_state, action):
@@ -213,6 +214,7 @@ class DefenseAgent(BaseAgent):
     """
     def get_features(self, game_state, action):
         features = util.Counter()
+
         successor = self.get_successor(game_state, action)
         my_state = successor.get_agent_state(self.index)
         my_position = my_state.get_position()
@@ -221,6 +223,7 @@ class DefenseAgent(BaseAgent):
 
         # Score feature
         features['successor_score'] = self.get_score(successor)
+
         '''
         # Movement features
         if action == Directions.STOP:
@@ -230,6 +233,7 @@ class DefenseAgent(BaseAgent):
             ]
         if action == rev:
             features['reverse'] = 1
+        '''
 
         # Enemy features
         enemies = [
@@ -247,7 +251,7 @@ class DefenseAgent(BaseAgent):
             features['invader_distance'] = min_distance
 
         # TODO Create a positive feature based on maze distance
-        '''
+
         return features
 
     def get_weights(self, game_state, action):
