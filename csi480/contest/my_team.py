@@ -68,7 +68,7 @@ class BaseAgent(CaptureAgent):
         actions = game_state.get_legal_actions(self.index)
         evaluation = [self.evaluate(game_state, action) for action in actions]
 
-        best_actions = [action for action, value in zip(actions, values) if value == max(values)]
+        best_actions = [action for action, value in zip(actions, evaluation) if value == max(evaluation)]
         food_left = len(self.get_food(game_state).as_list())
 
         " Get The Team's State "
@@ -111,14 +111,20 @@ class BaseAgent(CaptureAgent):
 
 
 
-        return random.choice_best(action)
+        return random.choice(best_actions)
 
     def get_successor(self, game_state, action):
         """
             Get the next successor
         """
+        successor = game_state.generate_successor(self.index, action)
+        successor_pos = successor.get_agent_state(self.index).get_position()
 
-        return game_state.generate_successor(self.index, action)
+        #Align to Grid
+        if(successor_pos != util.nearest_point(successor_pos)):
+            return successor.generate_successor(self.index, action)
+
+        return successor
 
     def evaluate(self, game_state, action):
         """
@@ -141,11 +147,12 @@ class BaseAgent(CaptureAgent):
     def get_weights(self):
         return {'successor_score':1.0}
 
-    def euclidean_heuristic(position, problem, info={}):
+    """def euclidean_heuristic(position, problem, info={}):
         "The Euclidean distance heuristic for a PositionSearchProblem -- Copied from Assignment 1"
         xy1 = position
         xy2 = problem.goal
         return ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
+    """
 
 
 class OffenseAgent(BaseAgent):
@@ -159,12 +166,13 @@ class OffenseAgent(BaseAgent):
         # Will an action decrease the food_left? (eating betters the score)
         # baseline_team does the same thing, its a good metric!
         successor = self.get_successor(game_state, action)
+        successor_pos = successor.get_agent_state(self.index).get_position()
         foods = self.get_food(successor).as_list()
         features['successor_score'] = -(len(foods))
 
         # Which action will get us closer to a dot?
         if(len(foods) > 0):
-            distance_to_food = min([self.get_maze_distance(successor.get_agent_state(self.index).get_position, dot) for dot in foods])
+            distance_to_food = min([self.get_maze_distance(successor_pos, dot) for dot in foods])
             features['distance_to_food'] = distance_to_food
 
         # Get enemies and seperate them into both ghosts and pacmans
@@ -174,14 +182,17 @@ class OffenseAgent(BaseAgent):
 
         # Avoid enemy ghosts
         if(len(enemy_ghosts) > 0):
-            ghost_min = min([self.get_maze_distance(successor.get_agent_state(self.index).get_position(), ghost_pos) for ghost_pos in enemy_ghosts])
+            ghost_min = min([self.get_maze_distance(successor_pos, ghost_pos.get_position()) for ghost_pos in enemy_ghosts])
             features['ghost_distance'] = ghost_min
 
 
         # If a Pacman is happened upon, go after it
         if(len(enemy_pacmans) > 0):
-            pacman_min = min([self.get_maze_distance(successor.get_agent_state(self.index).get_position(), pac_pos) for pac_pos in enemy_pacmans])
-            features['pacman_distance'] = pacman_min
+            pacman_min = min([self.get_maze_distance(successor_pos, pac_pos.get_position()) for pac_pos in enemy_pacmans])
+            if(pacmanmin <= 3):
+                features['pacman_distance'] = pacman_min
+            else:
+                features['pacman_distance'] = 0
 
 
         return features
@@ -232,14 +243,14 @@ class DefenseAgent(BaseAgent):
         features['num_invaders'] = len(invaders)
         if len(invaders):
             min_distance = min([
-                self.get_maze_distance(my_pos, x.get_position())
+                self.get_maze_distance(my_position, x.get_position())
                 for x in invaders
             ])
             features['invader_distance'] = min_distance
 
         # TODO Create a positive feature based on maze distance
 
-        util.raise_not_defined()
+        return features
 
     def get_weights(self, game_state, action):
         return {
