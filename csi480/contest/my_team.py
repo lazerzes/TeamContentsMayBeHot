@@ -142,21 +142,28 @@ class DefenseAgent(BaseAgent):
         if action == Directions.STOP:
             features['stop'] = 1
         elif action == Directions.REVERSE[
-            game_state.get_agent_state(self.index).configuration.direction]
+            game_state.get_agent_state(self.index).configuration.direction
+            ]
             features['reverse'] = 1
 
-        enemies = [successor.get_agent_state(x)
-                   for x in self.get_opponents(successor)]
-        invaders = [x for x in enemies
-                    if x.is_pacman and x.get_position() != None]
+        enemies = [
+            successor.get_agent_state(x)
+            for x in self.get_opponents(successor)
+            ]
+        invaders = [
+            x for x in enemies
+            if x.is_pacman and x.get_position() != None
+            ]
         num_invaders = len(invaders)
 
         util.raise_not_defined()
 
     def get_weights(self, game_state, action):
-        return {'successor_score': 1.0,
-                'stop' = -100,
-                'reverse' = -100}
+        return {
+            'successor_score': 1.0,
+            'stop' = -100,
+            'reverse' = -100
+            }
 
 class DummyAgent(CaptureAgent):
     """
