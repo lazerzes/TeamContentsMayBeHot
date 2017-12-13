@@ -189,7 +189,7 @@ class OffenseAgent(BaseAgent):
         # If a Pacman is happened upon, go after it
         if(len(enemy_pacmans) > 0):
             pacman_min = min([self.get_maze_distance(successor_pos, pac_pos.get_position()) for pac_pos in enemy_pacmans])
-            if(pacmanmin <= 3):
+            if(pacman_min <= 3):
                 features['pacman_distance'] = pacman_min
             else:
                 features['pacman_distance'] = 0
@@ -222,30 +222,28 @@ class DefenseAgent(BaseAgent):
         # Score feature
         features['successor_score'] = self.get_score(successor)
 
-        """# Movement features
+        # Movement features
         if action == Directions.STOP:
             features['stop'] = 1
-        elif action == Directions.REVERSE[
+        rev = Directions.REVERSE[
             game_state.get_agent_state(self.index).configuration.direction
             ]
+        if action == rev:
             features['reverse'] = 1
-        """
 
         # Enemy features
         enemies = [
-            successor.get_agent_state(x)
-            for x in self.get_opponents(successor)
+            successor.get_agent_state(x) for x in self.get_opponents(successor)
             ]
         invaders = [
-            x for x in enemies
-            if x.is_pacman and x.get_position() != None
+            x for x in enemies if x.is_pacman and x.get_position() != None
             ]
         features['num_invaders'] = len(invaders)
         if len(invaders):
             min_distance = min([
                 self.get_maze_distance(my_position, x.get_position())
                 for x in invaders
-            ])
+                ])
             features['invader_distance'] = min_distance
 
         # TODO Create a positive feature based on maze distance
