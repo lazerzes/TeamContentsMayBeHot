@@ -60,7 +60,6 @@ class BaseAgent(CaptureAgent):
 
         self.pos_start = game_state.get_agent_position(self.index)
         self.num_foods = len(self.get_food(game_state).as_list())
-        self.ini_foods = len(self.get_food(game_state).as_list())
 
     def choose_action(self, game_state):
         """
@@ -74,14 +73,49 @@ class BaseAgent(CaptureAgent):
 
         " Get The Team's State "
         team = [game_state.get_agent_state(agent) for agent in self.get_team(game_state)]
+        offense = team[0]
+        defense = team[1]
+
+        """
+            Chech to see if either agent is currently pacman, self.index 0 will
+            stop the defense player from caring about this check
+
+            Here we are going to check if the difference between eaten and
+            too eat(current score heald by pac man) is greater than 5
+            if it is we want it to return to its base.
+        """
+        if(not offense.is_pacman and not defense.is_pacman and self.index == 0):
+            #If neither is pacman we dont care, just update our current food count.
+            self.num_foods = food_left
+        elif(offense.is_pacman and not defense.is_pacman and self.index == 0):
+                #If Offense is pacman then get the current ammount of food eaten
+                dif_foods = self.num_foods - food_left
+                if(dif_foods >= 5):
+                    distance = float("inf")
+                    for action in actions:
+                        next_state = self.get_successor(self.index, action)
+                        temp = self.get_maze_distance(self.start, successor.get_agent_position(self.index))
+                        if(temp < distance):
+                            best_action = actions
+                            distance = temp
+                        return best_action
+                elif(food_left == 0 and dif_foods > 0):
+                    distance = float("inf")
+                    for action in actions:
+                        next_state = self.get_successor(self.index, action)
+                        temp = self.get_maze_distance(self.start, successor.get_agent_position(self.index))
+                        if(temp < distance):
+                            best_action = actions
+                            distance = temp
+                        return best_action
 
 
 
-        util.raise_not_defined()
+        return random.choice_best(action)
 
     def get_successor(self, game_state, action):
         """
-            Get the next successor (location tuple)
+            Get the next successor
         """
 
         util.raise_not_defined()
@@ -101,11 +135,11 @@ class BaseAgent(CaptureAgent):
         features = util.Counter()
         successor = get_successor(game_state)
 
-        features['successor'] = self.get_score(successor)
+        features['successor_score'] = self.get_score(successor)
         return features
 
     def get_weights(self):
-        return {'successor':1.0}
+        return {'successor_score':1.0}
 
     def euclidean_heuristic(position, problem, info={}):
         "The Euclidean distance heuristic for a PositionSearchProblem -- Copied from Assignment 1"
