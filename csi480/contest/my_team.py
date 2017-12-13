@@ -136,6 +136,9 @@ class DefenseAgent(BaseAgent):
         my_state = successor.get_agent_state(self.index)
         my_position = my_state.get_position()
 
+        # TODO: Select a target position
+
+        # Score feature
         features['successor_score'] = self.get_score(successor)
 
         # Movement features
@@ -146,6 +149,7 @@ class DefenseAgent(BaseAgent):
             ]
             features['reverse'] = 1
 
+        # Enemy features
         enemies = [
             successor.get_agent_state(x)
             for x in self.get_opponents(successor)
@@ -154,13 +158,23 @@ class DefenseAgent(BaseAgent):
             x for x in enemies
             if x.is_pacman and x.get_position() != None
             ]
-        num_invaders = len(invaders)
+        features['num_invaders'] = len(invaders)
+        if len(invaders):
+            min_distance = min([
+                self.get_maze_distance(my_pos, x.get_position())
+                for x in invaders
+            ])
+            features['invader_distance'] = min_distance
+
+        # TODO Create a positive feature based on maze distance
 
         util.raise_not_defined()
 
     def get_weights(self, game_state, action):
         return {
-            'successor_score': 1.0,
+            'successor_score': 1,
+            'num_invaders': -1000,
+            'invader_distance': -10
             'stop' = -100,
             'reverse' = -100
             }
