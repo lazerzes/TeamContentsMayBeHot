@@ -154,11 +154,47 @@ class OffenseAgent(BaseAgent):
     """
     def get_features(self, game_state, action):
 
-        util.raise_not_defined()
+        features = util.Counter()
+
+        # Will an action decrease the food_left? (eating betters the score)
+        # baseline_team does the same thing, its a good metric!
+        successor = self.get_successor(game_state, action)
+        foods = self.get_food(successor).as_list()
+        features['successor_score'] = -(len(foods))
+
+        # Which action will get us closer to a dot?
+        if(len(foods) > 0):
+            distance_to_food = min([self.get_maze_distance(successor.get_agent_state(self.index).get_position, dot) for dot in foods])
+            features['distance_to_food'] = distance_to_food
+
+        # Get enemies and seperate them into both ghosts and pacmans
+        enemies = [successor.get_agent_state(num) for num in self.get_opponents(successor)]
+        enemy_ghosts = [agent for agent in enemies if not agent.is_pacman and agent.get_position() is not None]
+        enemy_pacmans = [agent for agent in enemies if agent.is_pacman and agent.get_position() is not None]
+
+        # Avoid enemy ghosts
+        if(len(enemy_ghosts) > 0):
+            ghost_min = min([self.get_maze_distance(successor.get_agent_state(self.index).get_position(), ghost_pos) for ghost_pos in enemy_ghosts])
+            features['ghost_distance'] = ghost_min
+
+
+        # If a Pacman is happened upon, go after it
+        if(len(enemy_pacmans) > 0):
+            pacman_min = min([self.get_maze_distance(successor.get_agent_state(self.index).get_position(), pac_pos) for pac_pos in enemy_pacmans])
+            features['pacman_distance'] = pacman_min
+
+
+        return features
 
     def get_weights(self, game_state, action):
 
-        util.raise_not_defined()
+        return {
+            'successor_score' : 10,
+            'distance_to_food': -1,
+            'ghost_distance': 200,
+            'pacman_distance': 50
+
+        }
 
 class DefenseAgent(BaseAgent):
     """
@@ -175,13 +211,14 @@ class DefenseAgent(BaseAgent):
         # Score feature
         features['successor_score'] = self.get_score(successor)
 
-        # Movement features
+        """# Movement features
         if action == Directions.STOP:
             features['stop'] = 1
         elif action == Directions.REVERSE[
             game_state.get_agent_state(self.index).configuration.direction
             ]
             features['reverse'] = 1
+        """
 
         # Enemy features
         enemies = [
@@ -208,9 +245,9 @@ class DefenseAgent(BaseAgent):
         return {
             'successor_score': 1,
             'num_invaders': -1000,
-            'invader_distance': -10
-            'stop' = -100,
-            'reverse' = -100
+            'invader_distance': -10,
+            'stop': -100,
+            'reverse': -100
             }
 
 class DummyAgent(CaptureAgent):
