@@ -118,7 +118,7 @@ class BaseAgent(CaptureAgent):
             Get the next successor
         """
 
-        util.raise_not_defined()
+        return game_state.generate_successor(self.index, action)
 
     def evaluate(self, game_state, action):
         """
