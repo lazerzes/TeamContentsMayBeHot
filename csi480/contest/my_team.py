@@ -131,12 +131,23 @@ class DefenseAgent(BaseAgent):
         REDO Weights for Defense
     """
     def get_features(self, game_state, action):
+        features = util.Counter()
+        successor = self.get_successor(game_state, action)
+        my_state = successor.get_agent_state(self.index)
+        my_position = my_state.get_position()
 
-        score = get_score(game_state)
+        features['successor_score'] = self.get_score(successor)
 
-    def get_weights(self, game_state, action):
+        enemies = [successor.get_agent_state(x)
+                   for x in self.get_opponents(successor)]
+        invaders = [x for x in enemies
+                    if x.is_pacman and x.get_position() != None]
+        num_invaders = len(invaders)
 
         util.raise_not_defined()
+
+    def get_weights(self, game_state, action):
+        return {'successor_score': 1.0}
 
 class DummyAgent(CaptureAgent):
     """
