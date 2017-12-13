@@ -245,7 +245,6 @@ class DefenseAgent(BaseAgent):
         # Score feature
         features['successor_score'] = self.get_score(successor)
 
-        '''
         # Movement features
         if action == Directions.STOP:
             features['stop'] = 1
@@ -254,7 +253,6 @@ class DefenseAgent(BaseAgent):
             ]
         if action == rev:
             features['reverse'] = 1
-        '''
 
         # Enemy features
         enemies = [
@@ -280,8 +278,8 @@ class DefenseAgent(BaseAgent):
             'successor_score': 1,
             'num_invaders': -1000,
             'invader_distance': -10,
-            'stop': -100,
-            'reverse': -100
+            'stop': -1000,
+            'reverse': -2
             }
 
 class DummyAgent(CaptureAgent):
