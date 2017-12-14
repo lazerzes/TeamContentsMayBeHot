@@ -51,6 +51,78 @@ def create_team(first_index, second_index, is_red,
 ##########
 # Agents #
 ##########
+class BaseAgent(CaptureAgent):
+    """
+        Shared Code from between both Offense and Defense
+    """
+    def register_initial_state(self, game_state):
+        self.target_tile = None
+        self.start = game_state.get_agent_position(self.index)
+        self.food_count = len(self.get_food(game_state).as_list())
+        CaptureAgent.register_initial_state(self, game_state)
+
+    def choose_action(self, game_state):
+        """
+            Choose what action to take
+        """
+        legal_actions = game_state.get_legal_actions(self.index)
+        values = [self.evaluate(game_state, action) for action in legal_actions]
+        best_actions = [
+            action for action, value in zip(legal_actions, values)
+            if value == max(values)
+            ]
+
+        remaining_food = len(self.get_food(game_state).as_list())
+        '''
+        # Special case for food<=2, from baseline team
+        if remaining_food <= 2:
+            best_distance = float("inf")
+            for action in legal_actions:
+                successor = self.get_successor(game_state, action)
+                new_position = successor.get_agent_position(self.index)
+                distance = self.get_maze_distance(self.start, new_position)
+                if distance < best_distance:
+                    best_action = action
+                    best_distance = distance
+            return best_action
+        '''
+        return random.choice(best_actions)
+
+    def get_successor(self, game_state, action):
+        """
+            Get the next successor
+        """
+        successor = game_state.generate_successor(self.index, action)
+        successor_pos = successor.get_agent_state(self.index).get_position()
+
+        #Align to Grid
+        if (successor_pos != util.nearest_point(successor_pos)):
+            return successor.generate_successor(self.index, action)
+
+        return successor
+
+    def evaluate(self, game_state, action):
+        """
+            Evaluation Function --- No Need to Override
+        """
+
+        features = self.get_features(game_state, action)
+        weights = self.get_weights(game_state, action)
+
+        return (features * weights)
+
+    def get_features(self, game_state, action):
+
+        features = util.Counter()
+        successor = get_successor(game_state)
+
+        features['successor_score'] = self.get_score(successor)
+        return features
+
+    def get_weights(self):
+        return {'successor_score':1.0}
+
+
 class ExpectimaxAgent(CaptureAgent):
     def __circular_increment(self, x, b):
         x += 1
@@ -162,7 +234,7 @@ class ExpectimaxAgent(CaptureAgent):
         else:
             return successor
 
-class OffenseAgent(ExpectimaxAgent):
+class OffenseAgent(BaseAgent):
     """
         REDO Weights for Offense
     """
@@ -261,7 +333,7 @@ class OffenseAgent(ExpectimaxAgent):
             'reverse': -2
         }
 
-class DefenseAgent(ExpectimaxAgent):
+class DefenseAgent(BaseAgent):
     """
         REDO Weights for Defense
     """
@@ -272,13 +344,16 @@ class DefenseAgent(ExpectimaxAgent):
         my_position = my_state.get_position()
         food_list = self.get_food_you_are_defending(next_state).as_list()
 
-        if len(food_list) > 0:
-            food_distances = ([
-                self.get_maze_distance(my_position, food)
-                for food in food_list
-                ])
-            features['food_distance'] = min(food_distances)
-        features['food_distance'] = -len(food_list)
+        if not self.target_tile or my_position is self.target_tile:
+            if len(food_list) > 0:
+                food_distances = ([
+                    self.get_maze_distance(my_position, food)
+                    for food in food_list
+                    ])
+                self.target_tile = max(zip(food_list, food_distances),
+                                       key=lambda x:x[1])[0]
+        distance = self.get_maze_distance(my_position, self.target_tile)
+        features['food_distance'] = distance
 
         features['on_defense'] = 1
         if my_state.is_pacman:
@@ -293,7 +368,6 @@ class DefenseAgent(ExpectimaxAgent):
             agent for agent in all_enemies if agent.is_pacman
             if agent.get_position() is not None
             ]
-
         noisy_pacman_distances = [
             pacman.get_agent_distances() for pacman in enemy_pacmans
             if pacman.get_position() is None
@@ -307,6 +381,7 @@ class DefenseAgent(ExpectimaxAgent):
                 for pacman in enemy_pacmans
                 ])
             features['pacman_distance'] = pacman_distance
+        features['number_of_invaders'] = len(enemy_pacmans)
 
         if len(noisy_pacman_distances) > 0:
             features['noisy_pacman_distance'] = min(noisy_pacman_distances)
@@ -323,11 +398,19 @@ class DefenseAgent(ExpectimaxAgent):
         return features
 
     def get_weights(self, game_state, action):
-        return {
-            'food_distance': -10,
+        weights = {
+            'food_distance': -1,
             'on_defense' : 100,
-            'pacman_distance': -100,
-            'noisy_pacman_distance': -25,
+            'pacman_distance': -500,
+            'noisy_pacman_distance': -250,
+            'number_of_invaders': -1000,
             'stop': -100,
             'reverse': -2
         }
+
+        next_state = self.get_successor(game_state, action)
+        my_state = next_state.get_agent_state(self.index)
+        if my_state.scared_timer > 0:
+            weights['pacman_distance'] = 100
+
+        return weights
