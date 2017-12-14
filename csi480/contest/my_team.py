@@ -82,6 +82,7 @@ class ExpectimaxAgent(CaptureAgent):
         return self.get_expected
 
     def register_initial_state(self, game_state):
+        CaptureAgent.register_initial_state(self, game_state)
         self.start = game_state.get_agent_position(self.index)
         self.depth = 2
         self.team_indices = self.get_team(game_state)
@@ -93,11 +94,9 @@ class ExpectimaxAgent(CaptureAgent):
                 is_friendly = True
             self.roster.append(is_friendly)
 
-        CaptureAgent.register_initial_state(self, game_state)
-
     def evaluate(self, game_state):
         values = []
-        for action in self.get_legal_actions(game_state):
+        for action in game_state.get_legal_actions(self.index):
             features = self.get_features(game_state, action)
             weights = self.get_weights(game_state, action)
             values.append(features * weights)
@@ -119,7 +118,7 @@ class ExpectimaxAgent(CaptureAgent):
         return score
 
     def get_expected(self, game_state, agent_index, depth):
-        print('Running EXP on', agent_index)
+        print('Running EXP for', agent_index)
         if game_state.is_over() or depth is 0:
             return self.evaluate(game_state)
 
@@ -134,8 +133,7 @@ class ExpectimaxAgent(CaptureAgent):
         return total_value / len(legal_actions)
 
     def get_action(self, game_state):
-        print('My team:', self.team_indices)
-        print('Getting actions for', self.index)
+        print('Running ACT for', self.index)
         self.enemy_states = [
             game_state.get_agent_state(i)
             for i in self.enemy_indices
@@ -159,6 +157,17 @@ class ExpectimaxAgent(CaptureAgent):
                 preferred_action = action
         return preferred_action
 
+    def get_successor(self, game_state, action):
+        """
+        Finds the next successor which is a grid position (location tuple).
+        """
+        successor = game_state.generate_successor(self.index, action)
+        pos = successor.get_agent_state(self.index).get_position()
+        if pos != util.nearest_point(pos):
+            # Only half a grid position was covered
+            return successor.generate_successor(self.index, action)
+        else:
+            return successor
 
 class OffenseAgent(ExpectimaxAgent):
     """
@@ -281,47 +290,3 @@ class DefenseAgent(ExpectimaxAgent):
             'stop': -1000,
             'reverse': -5
             }
-
-class DummyAgent(CaptureAgent):
-    """
-    A Dummy agent to serve as an example of the necessary agent structure.
-    You should look at baseline_team.py for more details about how to
-    create an agent as this is the bare minimum.
-    """
-
-    def register_initial_state(self, game_state):
-        """
-        This method handles the initial setup of the
-        agent to populate useful fields (such as what team
-        we're on).
-
-        A distance_calculator instance caches the maze distances
-        between each pair of positions, so your agents can use:
-        self.distancer.get_distance(p1, p2)
-
-        IMPORTANT: This method may run for at most 15 seconds.
-        """
-
-        '''
-        Make sure you do not delete the following line. If you would like to
-        use Manhattan distances instead of maze distances in order to save
-        on initialization time, please take a look at
-        CaptureAgent.register_initial_state in capture_agents.py.
-        '''
-        CaptureAgent.register_initial_state(self, game_state)
-
-        '''
-        Your initialization code goes here, if you need any.
-        '''
-
-    def choose_action(self, game_state):
-        """
-        Picks among actions randomly.
-        """
-        actions = game_state.get_legal_actions(self.index)
-
-        '''
-        You should change this in your own agent.
-        '''
-
-        return random.choice(actions)
