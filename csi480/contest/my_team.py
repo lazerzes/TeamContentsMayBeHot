@@ -88,11 +88,7 @@ class ExpectimaxAgent(CaptureAgent):
         self.team_indices = self.get_team(game_state)
         self.enemy_indices = self.get_opponents(game_state)
         self.roster = []
-        for i in range(4):
-            is_friendly = False
-            if i in self.team_indices:
-                is_friendly = True
-            self.roster.append(is_friendly)
+        self.target_tile = None
 
     def evaluate(self, game_state):
         values = []
@@ -103,7 +99,6 @@ class ExpectimaxAgent(CaptureAgent):
         return max(values)
 
     def get_max(self, game_state, agent_index, depth):
-        print('Running MAX for', agent_index)
         if game_state.is_over() or depth is 0:
             return self.evaluate(game_state)
 
@@ -118,7 +113,6 @@ class ExpectimaxAgent(CaptureAgent):
         return score
 
     def get_expected(self, game_state, agent_index, depth):
-        print('Running EXP for', agent_index)
         if game_state.is_over() or depth is 0:
             return self.evaluate(game_state)
 
@@ -133,7 +127,6 @@ class ExpectimaxAgent(CaptureAgent):
         return total_value / len(legal_actions)
 
     def get_action(self, game_state):
-        print('Running ACT for', self.index)
         self.enemy_states = [
             game_state.get_agent_state(i)
             for i in self.enemy_indices
@@ -248,10 +241,34 @@ class DefenseAgent(ExpectimaxAgent):
         my_state = successor.get_agent_state(self.index)
         my_position = my_state.get_position()
 
-        # TODO: Select a target position
+        # Select a target position
+        if not self.target_tile or my_position is self.target_tile:
+            targets = self.get_food_you_are_defending(game_state).as_list()
+            self.target_tile = random.choice(targets)
+
+        # Target feature
+        features['target_distance'] = self.get_maze_distance(my_position,
+                                                             self.target_tile)
 
         # Score feature
-        features['successor_score'] = self.get_score(successor)
+        features['on_defense'] = 1
+        if my_state.is_pacman:
+            features['on_defense'] = 0
+
+        # Enemy features
+        enemies = [
+            successor.get_agent_state(x) for x in self.get_opponents(successor)
+            ]
+        invaders = [
+            x for x in enemies if x.is_pacman and x.get_position() != None
+            ]
+        features['num_invaders'] = len(invaders)
+        if len(invaders) > 0:
+            min_distance = min([
+                self.get_maze_distance(my_position, x.get_position())
+                for x in invaders
+                ])
+            features['invader_distance'] = min_distance
 
         # Movement features
         if action == Directions.STOP:
@@ -262,21 +279,6 @@ class DefenseAgent(ExpectimaxAgent):
         if action == rev:
             features['reverse'] = 1
 
-        # Enemy features
-        enemies = [
-            successor.get_agent_state(x) for x in self.get_opponents(successor)
-            ]
-        invaders = [
-            x for x in enemies if x.is_pacman and x.get_position() != None
-            ]
-        features['num_invaders'] = len(invaders)
-        if len(invaders):
-            min_distance = min([
-                self.get_maze_distance(my_position, x.get_position())
-                for x in invaders
-                ])
-            features['invader_distance'] = min_distance
-
         # TODO Create a negative feature based on shortest enemy distance to
         # a capsule we are defending
 
@@ -284,9 +286,10 @@ class DefenseAgent(ExpectimaxAgent):
 
     def get_weights(self, game_state, action):
         return {
-            'successor_score': 1,
+            'on_defense': 100,
             'num_invaders': -1000,
             'invader_distance': -10,
-            'stop': -1000,
-            'reverse': -5
+            'stop': -10000,
+            'reverse': -10000,
+            'target_distance': 10
             }
