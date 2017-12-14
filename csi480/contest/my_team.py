@@ -167,108 +167,76 @@ class OffenseAgent(ExpectimaxAgent):
         REDO Weights for Offense
     """
     def get_features(self, game_state, action):
-
         features = util.Counter()
+        next_state = self.get_successor(game_state, action)
+        my_state = next_state.get_agent_state(self.index)
+        my_position = my_state.get_position()
+        food_list = self.get_food(next_state).as_list()
 
-        # Will an action decrease the food_left? (eating betters the score)
-        # baseline_team does the same thing, its a good metric!
-        successor = self.get_successor(game_state, action)
-        successor_pos = successor.get_agent_state(self.index).get_position()
-        foods = self.get_food(successor).as_list()
-        features['successor_score'] = -(len(foods))
+        features['score'] = -len(food_list)
 
         # Which action will get us closer to a dot?
-        if(len(foods) > 0):
-            distance_to_food = min([self.get_maze_distance(successor_pos, dot) for dot in foods])
-            features['distance_to_food'] = distance_to_food
+        if len(food_list) > 0:
+            food_distances = ([
+                self.get_maze_distance(my_position, food)
+                for food in food_list
+                ])
+            features['food_distance'] = min(food_distances)
+
+        capsule_list = self.get_capsules(next_state)
+        if len(capsule_list) > 0:
+            capsule_distances = ([
+                self.get_maze_distance(my_position, capsule)
+                for capsule in capsule_list
+                ])
+            features['capsule_distance'] = min(capsule_distances)
 
         # Get enemies and seperate them into both ghosts and pacmans
-        enemies = [
-            successor.get_agent_state(num)
-            for num in self.get_opponents(successor)
+        all_enemies = [
+            next_state.get_agent_state(i)
+            for i in self.get_opponents(next_state)
             ]
         enemy_ghosts = [
-            agent for agent in enemies if not agent.is_pacman
-            and agent.get_position() is not None
+            agent for agent in all_enemies
+            if not agent.is_pacman
+            and agent.scared_timer == 0
+            if agent.get_position() is not None
+            ]
+        enemy_ghosts_scared = [
+            agent for agent in all_enemies if not agent.is_pacman
+            if agent.get_position() is not None
+            and agent.scared_timer > 0
             ]
         enemy_pacmans = [
-            agent for agent in enemies if agent.is_pacman
-            and agent.get_position() is not None
+            agent for agent in all_enemies if agent.is_pacman
+            if agent.get_position() is not None
             ]
 
         # Avoid enemy ghosts
-        if(len(enemy_ghosts) > 0):
-            ghost_min = min(
-                [self.get_maze_distance(successor_pos, ghost_pos.get_position())
-                for ghost_pos in enemy_ghosts
+        if len(enemy_ghosts) > 0:
+            ghost_distance = min([
+                self.get_maze_distance(my_position,
+                                       ghost.get_position())
+                for ghost in enemy_ghosts
                 ])
-            features['ghost_distance'] = ghost_min
+            features['ghost_distance'] = ghost_distance
 
+        if len(enemy_ghosts_scared) > 0:
+            ghost_distance = min([
+                self.get_maze_distance(my_position,
+                                       ghost.get_position())
+                for ghost in enemy_ghosts_scared
+                ])
+            features['scared_ghost_distance'] = ghost_distance
 
         # If a Pacman is happened upon, go after it
-        if(len(enemy_pacmans) > 0):
-            pacman_min = min([
-                self.get_maze_distance(successor_pos, pac_pos.get_position())
-                for pac_pos in enemy_pacmans
+        if len(enemy_pacmans) > 0:
+            pacman_distance = min([
+                self.get_maze_distance(my_position,
+                                       pacman.get_position())
+                for pacman in enemy_pacmans
                 ])
-            if(pacman_min <= 3):
-                features['pacman_distance'] = pacman_min
-            else:
-                features['pacman_distance'] = 0
-
-
-        return features
-
-    def get_weights(self, game_state, action):
-
-        return {
-            'successor_score' : 10,
-            'distance_to_food': -1,
-            'ghost_distance': 200,
-            'pacman_distance': 50
-
-        }
-
-
-class DefenseAgent(ExpectimaxAgent):
-    """
-        REDO Weights for Defense
-    """
-    def get_features(self, game_state, action):
-        features = util.Counter()
-
-        successor = self.get_successor(game_state, action)
-        my_state = successor.get_agent_state(self.index)
-        my_position = my_state.get_position()
-
-        # Select a target position
-        if not self.target_tile or my_position is self.target_tile:
-            targets = self.get_food_you_are_defending(game_state).as_list()
-            self.target_tile = random.choice(targets)
-
-        # Target feature
-        features['target_distance'] = self.get_maze_distance(my_position,
-                                                             self.target_tile)
-
-        # Score feature
-        features['on_defense'] = 1
-        if my_state.is_pacman:
-            features['on_defense'] = 0
-
-        # Enemy features
-        enemies = [
-            successor.get_agent_state(x) for x in self.get_opponents(successor)
-            ]
-        invaders = [
-            x for x in enemies if x.is_pacman and x.get_position() != None
-            ]
-        features['num_invaders'] = len(invaders)
-        if len(invaders) > 0:
-            min_distance = min([
-                self.get_maze_distance(my_position, x.get_position())
-                for x in invaders
-                ])
-            features['invader_distance'] = min_distance
+            features['pacman_distance'] = pacman_distance
 
         # Movement features
         if action == Directions.STOP:
@@ -279,17 +247,87 @@ class DefenseAgent(ExpectimaxAgent):
         if action == rev:
             features['reverse'] = 1
 
-        # TODO Create a negative feature based on shortest enemy distance to
-        # a capsule we are defending
+        return features
+
+    def get_weights(self, game_state, action):
+        return {
+            'score' : 1000,
+            'food_distance': -1,
+            'capsule_distance': -3,
+            'ghost_distance': 20,
+            'scared_ghost_distance': -10,
+            'pacman_distance': -5,
+            'stop': -100,
+            'reverse': -2
+        }
+
+class DefenseAgent(ExpectimaxAgent):
+    """
+        REDO Weights for Defense
+    """
+    def get_features(self, game_state, action):
+        features = util.Counter()
+        next_state = self.get_successor(game_state, action)
+        my_state = next_state.get_agent_state(self.index)
+        my_position = my_state.get_position()
+        food_list = self.get_food_you_are_defending(next_state).as_list()
+
+        if len(food_list) > 0:
+            food_distances = ([
+                self.get_maze_distance(my_position, food)
+                for food in food_list
+                ])
+            features['food_distance'] = min(food_distances)
+        features['food_distance'] = -len(food_list)
+
+        features['on_defense'] = 1
+        if my_state.is_pacman:
+            features['on_defense'] = 0
+
+        # Get enemies and seperate them
+        all_enemies = [
+            next_state.get_agent_state(i)
+            for i in self.get_opponents(next_state)
+            ]
+        enemy_pacmans = [
+            agent for agent in all_enemies if agent.is_pacman
+            if agent.get_position() is not None
+            ]
+
+        noisy_pacman_distances = [
+            pacman.get_agent_distances() for pacman in enemy_pacmans
+            if pacman.get_position() is None
+        ]
+
+        # If a Pacman is happened upon, go after it
+        if len(enemy_pacmans) > 0:
+            pacman_distance = min([
+                self.get_maze_distance(my_position,
+                                       pacman.get_position())
+                for pacman in enemy_pacmans
+                ])
+            features['pacman_distance'] = pacman_distance
+
+        if len(noisy_pacman_distances) > 0:
+            features['noisy_pacman_distance'] = min(noisy_pacman_distances)
+
+        # Movement features
+        if action == Directions.STOP:
+            features['stop'] = 1
+        rev = Directions.REVERSE[
+            game_state.get_agent_state(self.index).configuration.direction
+            ]
+        if action == rev:
+            features['reverse'] = 1
 
         return features
 
     def get_weights(self, game_state, action):
         return {
-            'on_defense': 100,
-            'num_invaders': -1000,
-            'invader_distance': -10,
-            'stop': -10000,
-            'reverse': -10000,
-            'target_distance': 10
-            }
+            'food_distance': -10,
+            'on_defense' : 100,
+            'pacman_distance': -100,
+            'noisy_pacman_distance': -25,
+            'stop': -100,
+            'reverse': -2
+        }
