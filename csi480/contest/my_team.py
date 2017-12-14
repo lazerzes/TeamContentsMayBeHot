@@ -51,131 +51,116 @@ def create_team(first_index, second_index, is_red,
 ##########
 # Agents #
 ##########
-class BaseAgent(CaptureAgent):
-    """
-        Shared Code from between both Offense and Defense
-    """
+class ExpectimaxAgent(CaptureAgent):
+    def __circular_increment(self, x, b):
+        x += 1
+        if x > b:
+            x = 0
+        return x
+
+    def __is_agent_visible(self, index):
+        if index in self.team_indices:
+            return True
+        visible_enemies = {
+            i:x
+            for i,x in zip(self.enemy_indices, self.enemy_states)
+            if x.get_position() is not None
+            }
+        if visible_enemies.get(index):
+            return True
+        return False
+
+    def __get_next_index(self, index):
+        index = self.__circular_increment(index, 3)
+        if not self.__is_agent_visible(index):
+            index = self.__circular_increment(index, 3)
+        return index
+
+    def __get_optimization_function(self, index):
+        if index in self.team_indices:
+            return self.get_max
+        return self.get_expected
+
     def register_initial_state(self, game_state):
+        self.start = game_state.get_agent_position(self.index)
+        self.depth = 2
+        self.team_indices = self.get_team(game_state)
+        self.enemy_indices = self.get_opponents(game_state)
+        self.roster = []
+        for i in range(4):
+            is_friendly = False
+            if i in self.team_indices:
+                is_friendly = True
+            self.roster.append(is_friendly)
+
         CaptureAgent.register_initial_state(self, game_state)
 
-        self.start = game_state.get_agent_position(self.index)
-        self.food_count = len(self.get_food(game_state).as_list())
+    def evaluate(self, game_state):
+        values = []
+        for action in self.get_legal_actions(game_state):
+            features = self.get_features(game_state, action)
+            weights = self.get_weights(game_state, action)
+            values.append(features * weights)
+        return max(values)
 
-    def choose_action(self, game_state):
-        """
-            Choose what action to take
-        """
+    def get_max(self, game_state, agent_index, depth):
+        print('Running MAX for', agent_index)
+        if game_state.is_over() or depth is 0:
+            return self.evaluate(game_state)
+
+        legal_actions = game_state.get_legal_actions(agent_index)
+        score = -float('inf')-1
+
+        for action in legal_actions:
+            next_state = game_state.generate_successor(agent_index, action)
+            next_index = self.__get_next_index(agent_index)
+            next_function = self.__get_optimization_function(next_index)
+            score = max(score, next_function(next_state, next_index, depth-1))
+        return score
+
+    def get_expected(self, game_state, agent_index, depth):
+        print('Running EXP on', agent_index)
+        if game_state.is_over() or depth is 0:
+            return self.evaluate(game_state)
+
+        legal_actions = game_state.get_legal_actions(agent_index)
+        total_value = 0
+
+        for action in legal_actions:
+            next_state = game_state.generate_successor(agent_index, action)
+            next_index = self.__get_next_index(agent_index)
+            next_function = self.__get_optimization_function(next_index)
+            total_value += next_function(next_state, next_index, depth-1)
+        return total_value / len(legal_actions)
+
+    def get_action(self, game_state):
+        print('My team:', self.team_indices)
+        print('Getting actions for', self.index)
+        self.enemy_states = [
+            game_state.get_agent_state(i)
+            for i in self.enemy_indices
+            ]
+
+        if game_state.is_over():
+            return self.evaluate(game_state)
+
         legal_actions = game_state.get_legal_actions(self.index)
-        values = [self.evaluate(game_state, action) for action in legal_actions]
-        best_actions = [
-            action for action, value in zip(legal_actions, values)
-            if value == max(values)
-            ]
+        preferred_action = Directions.STOP
+        score = -float('inf')-1
 
-        remaining_food = len(self.get_food(game_state).as_list())
-        '''
-        # Special case for food<=2, from baseline team
-        if remaining_food <= 2:
-            best_distance = float("inf")
-            for action in legal_actions:
-                successor = self.get_successor(game_state, action)
-                new_position = successor.get_agent_position(self.index)
-                distance = self.get_maze_distance(self.start, new_position)
-                if distance < best_distance:
-                    best_action = action
-                    best_distance = distance
-            return best_action
-        '''
-        return random.choice(best_actions)
+        for action in legal_actions:
+            next_state = game_state.generate_successor(self.index, action)
+            previous_score = score
+            next_index = self.__get_next_index(self.index)
+            next_function = self.__get_optimization_function(next_index)
+            score = max(score,
+                        next_function(next_state, next_index, self.depth))
+            if score > previous_score:
+                preferred_action = action
+        return preferred_action
 
-        # Get the team state
-        team = [
-            game_state.get_agent_state(agent)
-            for agent in self.get_team(game_state)
-            ]
-        offense = team[0]
-        defense = team[1]
 
-        """
-            Chech to see if either agent is currently pacman, self.index 0 will
-            stop the defense player from caring about this check
-
-            Here we are going to check if the difference between eaten and
-            too eat(current score heald by pac man) is greater than 5
-            if it is we want it to return to its base.
-        """
-        # If neither is pacman then just update our current food count
-        if (not offense.is_pacman and not defense.is_pacman
-                and self.index == 0):
-            self.food_count = remaining_food
-        # If Offense is pacman then get the current amount of food eaten
-        elif (offense.is_pacman and not defense.is_pacman
-                and self.index == 0):
-            dif_foods = self.food_count - remaining_food
-            if (dif_foods >= 5):
-                distance = float("inf")
-                for action in legal_actions:
-                    successor = self.get_successor(game_state, action)
-                    new_position = successor.get_agent_position(self.index)
-                    temp = self.get_maze_distance(self.start, new_position)
-                    if(temp < distance):
-                        best_action = legal_actions
-                        distance = temp
-                    return best_action
-            elif (remaining_food == 0 and dif_foods > 0):
-                distance = float("inf")
-                for action in legal_actions:
-                    next_state = self.get_successor(self.index, action)
-                    new_position = successor.get_agent_position(self.index)
-                    temp = self.get_maze_distance(self.start, new_position)
-                    if(temp < distance):
-                        best_action = legal_actions
-                        distance = temp
-                    return best_action
-        return random.choice(best_actions)
-
-    def get_successor(self, game_state, action):
-        """
-            Get the next successor
-        """
-        successor = game_state.generate_successor(self.index, action)
-        successor_pos = successor.get_agent_state(self.index).get_position()
-
-        #Align to Grid
-        if (successor_pos != util.nearest_point(successor_pos)):
-            return successor.generate_successor(self.index, action)
-
-        return successor
-
-    def evaluate(self, game_state, action):
-        """
-            Evaluation Function --- No Need to Override
-        """
-
-        features = self.get_features(game_state, action)
-        weights = self.get_weights(game_state, action)
-
-        return (features * weights)
-
-    def get_features(self, game_state, action):
-
-        features = util.Counter()
-        successor = get_successor(game_state)
-
-        features['successor_score'] = self.get_score(successor)
-        return features
-
-    def get_weights(self):
-        return {'successor_score':1.0}
-
-    """def euclidean_heuristic(position, problem, info={}):
-        "The Euclidean distance heuristic for a PositionSearchProblem -- Copied from Assignment 1"
-        xy1 = position
-        xy2 = problem.goal
-        return ((xy1[0] - xy2[0]) ** 2 + (xy1[1] - xy2[1]) ** 2) ** 0.5
-    """
-
-class OffenseAgent(BaseAgent):
+class OffenseAgent(ExpectimaxAgent):
     """
         REDO Weights for Offense
     """
@@ -242,7 +227,8 @@ class OffenseAgent(BaseAgent):
 
         }
 
-class DefenseAgent(BaseAgent):
+
+class DefenseAgent(ExpectimaxAgent):
     """
         REDO Weights for Defense
     """
@@ -282,7 +268,8 @@ class DefenseAgent(BaseAgent):
                 ])
             features['invader_distance'] = min_distance
 
-        # TODO Create a positive feature based on maze distance
+        # TODO Create a negative feature based on shortest enemy distance to
+        # a capsule we are defending
 
         return features
 
@@ -338,72 +325,3 @@ class DummyAgent(CaptureAgent):
         '''
 
         return random.choice(actions)
-
-class ExpectimaxAgent(CaptureAgent):
-    def __get_next_index(self, index):
-        index += 1
-        if index > 3:
-            index = 0
-        return index
-
-    def register_initial_state:
-        self.start = game_state.get_agent_position(self.index)
-        self.depth = 2
-        self.team = get_team()
-        if self.index == team[0]:
-            self.get_features = get_offensive_features
-            self.get_weights = get_offensive_weights
-        else:
-            self.get_features = get_defensive_features
-            self.get_weights = get_defensive_weights
-        CaptureAgent.register_initial_state(self, game_state)
-
-    def evaluate(self, game_state, action):
-        features = self.get_features(game_state, action)
-        weights = self.get_weights(game_state, action)
-        return features * weights
-
-    def get_max(self, game_state, agent_index, depth):
-        if game_state.is_win() or game_state.is_lose():
-            return self.evaluate(game_state)
-
-        legal_actions = game_state.get_legal_actions(agent_index)
-        score = -float('inf')-1
-
-        for action in legal_actions:
-            next_state = game_state.generate_successor(agent_index, action)
-            next_index = self.__get_next_index(agent_index)
-            score = max(score, self.get_expected(next_state, next_index, depth))
-        return score
-
-    def get_expected(self, game_state, agent_index, depth):
-        if game_state.is_win() or game_state.is_lose():
-            return self.evaluate(game_state)
-
-        legal_actions = game_state.get_legal_actions(agent_index)
-        total_value = 0
-
-        for action in legal_actions:
-            next_state = game_state.generate_successor(agent_index, action)
-            next_index = __get_next_index(agent_index)
-            total_value += self.get_max(next_state, next_index, depth-1)
-        return total_value / len(legal_actions)
-
-    def get_action(self, game_state):
-        if game_state.is_win() or game_state.is_lose():
-            return self.evaluate(game_state)
-
-        legal_actions = game_state.get_legal_actions(self.index)
-        preferred_action = Directions.STOP
-        score = -float('inf')-1
-
-        for action in legal_actions:
-            next_state = game_state.generate_successor(self.index, action)
-            previous_score = score
-            next_index = __get_next_index(self.index)
-            score = max(score, self.get_expected(next_state,
-                                                 next_index,
-                                                 self.depth))
-            if score > previous_score:
-                preferred_action = action
-        return preferred_action
